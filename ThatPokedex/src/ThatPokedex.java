@@ -2070,7 +2070,7 @@ public class ThatPokedex {
 				
 				
 				else {
-					JOptionPane.showMessageDialog(null, "Please select a filter before using this button.", "That Pokedex Apply Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Please select a sort before using this button.", "That Pokedex Apply Error", JOptionPane.ERROR_MESSAGE);
 				}
 				
 			}
