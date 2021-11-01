@@ -61,7 +61,7 @@ public class ThatPokedexAdmin {
 	private void initialize() {
 		frmThatPokedex = new JFrame();
 		frmThatPokedex.setTitle("That Pokedex - Admin");
-		frmThatPokedex.setBounds(100, 100, 579, 472);
+		frmThatPokedex.setBounds(100, 100, 579, 576);
 		frmThatPokedex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmThatPokedex.getContentPane().setLayout(null);
 		
@@ -2134,5 +2134,54 @@ public class ThatPokedexAdmin {
 		btnArchive.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		btnArchive.setBounds(348, 377, 95, 32);
 		frmThatPokedex.getContentPane().add(btnArchive);
+		
+		//Adding Filter section
+		JLabel lblFilterBy = new JLabel("Filter By:");
+		lblFilterBy.setFont(new Font("Tahoma", Font.BOLD, 16));
+		lblFilterBy.setBounds(20, 461, 104, 26);
+		frmThatPokedex.getContentPane().add(lblFilterBy);
+		
+		JComboBox comboBox = new JComboBox();
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"Type", "Bug", "Bug, Fairy", "Bug, Flying", "Bug, Poison", "Dark", "Dragon", "Dragon, Psychic", "Electric", "Electric, Poison", "Fairy", "Fighting", "Fire", "Ghost ", "Ghost, Grass", "Grass", "Grass, Dragon", "Grass, Flying", "Grass, Poison", "Ground", "Ground, Psychic", "Ice", "Ice, Water", "Normal", "Normal, Fairy", "Normal, Flying", "Poison", "Poison, Flying", "Poison, Water", "Psychic", "Psychic, Fairy", "Psychic, Fire", "Psychic, Flying", "Psychic, Grass", "Rock", "Rock, Bug", "Rock, Fairy", "Rock, Grass", "Rock, Ground", "Rock, Ice", "Water", "Water, Electric", "Water, Fairy", "Water, Ground", "Water, Psychic"}));
+		comboBox.setBounds(107, 466, 104, 21);
+		frmThatPokedex.getContentPane().add(comboBox);
+		
+		JComboBox comboBox_1 = new JComboBox();
+		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"Generation", "Generation 1", "Generation 2", "Generation 3", "Generation 4", "Generation 5", "Generation 6", "Generation 7", "Generation 8"}));
+		comboBox_1.setBounds(215, 466, 104, 21);
+		frmThatPokedex.getContentPane().add(comboBox_1);
+		
+		JComboBox comboBox_2 = new JComboBox();
+		comboBox_2.setModel(new DefaultComboBoxModel(new String[] {"Size", "~ 0 ft.", "~ 1 ft.", "~ 2 ft.", "~ 3 ft.", "> 3 ft."}));
+		comboBox_2.setBounds(323, 466, 104, 21);
+		frmThatPokedex.getContentPane().add(comboBox_2);
+		
+		JComboBox comboBox_3 = new JComboBox();
+		comboBox_3.setModel(new DefaultComboBoxModel(new String[] {"Weight", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
+		comboBox_3.setBounds(433, 466, 104, 21);
+		frmThatPokedex.getContentPane().add(comboBox_3);
+		
+		JButton btnNewButton_1_1_1_1_2 = new JButton("Apply");
+		btnNewButton_1_1_1_1_2.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnNewButton_1_1_1_1_2.setBounds(192, 497, 115, 28);
+		frmThatPokedex.getContentPane().add(btnNewButton_1_1_1_1_2);
+		
+		//Made a clear filter button, makes the JList back to normal
+		JButton btnNewButton_1_1_1_1_1_1 = new JButton("Clear Filter");
+		btnNewButton_1_1_1_1_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				comboBox.setModel(new DefaultComboBoxModel(new String[] {"Type", "Bug", "Bug, Fairy", "Bug, Flying", "Bug, Poison", "Dark", "Dragon", "Dragon, Psychic", "Electric", "Electric, Poison", "Fairy", "Fighting", "Fire", "Ghost ", "Ghost, Grass", "Grass", "Grass, Dragon", "Grass, Flying", "Grass, Poison", "Ground", "Ground, Psychic", "Ice", "Ice, Water", "Normal", "Normal, Fairy", "Normal, Flying", "Poison", "Poison, Flying", "Poison, Water", "Psychic", "Psychic, Fairy", "Psychic, Fire", "Psychic, Flying", "Psychic, Grass", "Rock", "Rock, Bug", "Rock, Fairy", "Rock, Grass", "Rock, Ground", "Rock, Ice", "Water", "Water, Electric", "Water, Fairy", "Water, Ground", "Water, Psychic"}));
+				comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"Generation", "Generation 1", "Generation 2", "Generation 3", "Generation 4", "Generation 5", "Generation 6", "Generation 7", "Generation 8"}));
+				comboBox_2.setModel(new DefaultComboBoxModel(new String[] {"Size", "~ 0 ft.", "~ 1 ft.", "~ 2 ft.", "~ 3 ft.", "> 3 ft."}));
+				comboBox_3.setModel(new DefaultComboBoxModel(new String[] {"Weight", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
+			}
+		});
+		btnNewButton_1_1_1_1_1_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		btnNewButton_1_1_1_1_1_1.setBounds(312, 497, 115, 28);
+		frmThatPokedex.getContentPane().add(btnNewButton_1_1_1_1_1_1);
+		
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setBounds(20, 449, 535, 2);
+		frmThatPokedex.getContentPane().add(separator_2);
 	}
 }
