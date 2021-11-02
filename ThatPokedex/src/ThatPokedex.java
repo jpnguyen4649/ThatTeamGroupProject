@@ -1979,7 +1979,7 @@ public class ThatPokedex {
       btnNewButton_1_1_1.setBounds(358, 169, 88, 28);
       frmThatPokedex.getContentPane().add(btnNewButton_1_1_1);
    	
-      JLabel lblFilter = new JLabel("Filter:");
+      JLabel lblFilter = new JLabel("Sort By:");
       lblFilter.setFont(new Font("Tahoma", Font.BOLD, 16));
       lblFilter.setBounds(260, 218, 104, 26);
       frmThatPokedex.getContentPane().add(lblFilter);
