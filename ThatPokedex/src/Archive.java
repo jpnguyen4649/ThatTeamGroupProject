@@ -6,6 +6,7 @@ import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class Archive {
@@ -75,7 +76,12 @@ public class Archive {
 		JButton btnCancel = new JButton("Back");
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ThatPokedexAdmin admin = new ThatPokedexAdmin();
+				try {
+					ThatPokedexAdmin admin = new ThatPokedexAdmin();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				ThatPokedexAdmin.main(null);
 				frmThatArchive.dispose();
 			}

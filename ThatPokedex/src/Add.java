@@ -10,6 +10,7 @@ import javax.swing.JTextField;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class Add {
@@ -120,7 +121,12 @@ public class Add {
 		JButton btnCancdel = new JButton("Back");
 		btnCancdel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ThatPokedexAdmin admin = new ThatPokedexAdmin(); 
+				try {
+					ThatPokedexAdmin admin = new ThatPokedexAdmin();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
 				ThatPokedexAdmin.main(null);
 				frmThatAdd.dispose();
 			}

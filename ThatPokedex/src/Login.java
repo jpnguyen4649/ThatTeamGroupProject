@@ -9,6 +9,7 @@ import javax.swing.JTextField;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
 public class Login {
@@ -86,7 +87,12 @@ public class Login {
 				else if(password.equals("root")) { //This is for the admin's password
 					txtPassword.setText(null);
 					
-					ThatPokedexAdmin admin = new ThatPokedexAdmin(); //admin's pokedex database pops up
+					try {
+						ThatPokedexAdmin admin = new ThatPokedexAdmin();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} //admin's pokedex database pops up
 					ThatPokedexAdmin.main(null);
 					frmThatPokedexLogin.dispose();
 				}

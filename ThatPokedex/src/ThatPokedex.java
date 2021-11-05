@@ -53,6 +53,8 @@ public class ThatPokedex {
       initialize();
    }
 
+   
+
 	/**
 	 * Initialize the contents of the frame.
 	 */
@@ -63,6 +65,7 @@ public class ThatPokedex {
       frmThatPokedex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       frmThatPokedex.getContentPane().setLayout(null);
    	
+      // About button.
       JButton btnNewButton = new JButton("About");
       btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
       btnNewButton.addActionListener(
@@ -76,6 +79,7 @@ public class ThatPokedex {
       btnNewButton.setBounds(440, 340, 95, 32);
       frmThatPokedex.getContentPane().add(btnNewButton);
    	
+      // Logout button.
       JButton btnLogOut = new JButton("Log Out");
       btnLogOut.addActionListener(
          new ActionListener() {
@@ -96,6 +100,7 @@ public class ThatPokedex {
       scrollPane.setBounds(20, 21, 230, 307);
       frmThatPokedex.getContentPane().add(scrollPane);
    	
+      
       JList list = new JList();
       scrollPane.setViewportView(list);
       list.setModel(
@@ -118,6 +123,7 @@ public class ThatPokedex {
       txtrInformationAboutThe.setBounds(265, 22, 270, 137);
       frmThatPokedex.getContentPane().add(txtrInformationAboutThe);
    	
+      // Search bar:
       JLabel lblNewLabel = new JLabel("Search:");
       lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
       lblNewLabel.setBounds(20, 366, 104, 26);
@@ -1052,6 +1058,7 @@ public class ThatPokedex {
       btnNewButton_1_1.setBounds(247, 395, 88, 28);
       frmThatPokedex.getContentPane().add(btnNewButton_1_1);
    	
+      // Select button
       JButton btnNewButton_1 = new JButton("Select");
       btnNewButton_1.setFont(new Font("Tahoma", Font.PLAIN, 14));
       btnNewButton_1.addActionListener(
@@ -1967,6 +1974,7 @@ public class ThatPokedex {
       btnNewButton_1.setBounds(86, 338, 88, 27);
       frmThatPokedex.getContentPane().add(btnNewButton_1);
    	
+      // Refresh button.
       JButton btnNewButton_1_1_1 = new JButton("Refresh");
       btnNewButton_1_1_1.addActionListener(
          new ActionListener() {
@@ -1979,6 +1987,7 @@ public class ThatPokedex {
       btnNewButton_1_1_1.setBounds(358, 169, 88, 28);
       frmThatPokedex.getContentPane().add(btnNewButton_1_1_1);
    	
+      // Filters.
       JLabel lblFilter = new JLabel("Sort By:");
       lblFilter.setFont(new Font("Tahoma", Font.BOLD, 16));
       lblFilter.setBounds(260, 218, 104, 26);
