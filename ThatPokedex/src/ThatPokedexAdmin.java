@@ -327,14 +327,14 @@ public class ThatPokedexAdmin {
    	
    	//Made an archive button for the admin to archive the pokemon and it brings them to a diff page
       JButton btnArchive = new JButton("Archive");
-      btnArchive.addActionListener(
-         new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-               Archive archive = new Archive(); 
-               Archive.main(null);
-               frmThatPokedex.dispose();
-            }
-         });
+//      btnArchive.addActionListener(
+//         new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//               Archive archive = new Archive(); 
+//               Archive.main(null);
+//               frmThatPokedex.dispose();
+//            }
+//         });
       btnArchive.setFont(new Font("Tahoma", Font.PLAIN, 14));
       btnArchive.setBounds(348, 377, 95, 32);
       frmThatPokedex.getContentPane().add(btnArchive);

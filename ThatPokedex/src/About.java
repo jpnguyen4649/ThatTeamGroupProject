@@ -117,8 +117,6 @@ public class About {
 		JButton btnNewButton = new JButton("Back to Pokedex");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				ThatPokedex database = new ThatPokedex(); 
-				ThatPokedex.main(null);
 				frmThatAboutPage.dispose();
 			}
 		});

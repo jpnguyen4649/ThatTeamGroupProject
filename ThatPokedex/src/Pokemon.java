@@ -1,13 +1,14 @@
 public class Pokemon {
     private String name;
     private String types;
-    private String generation;
-    private String weight;
-    private String size;
+    private int generation;
+    private float weight;
+    private int size;
     private boolean visible;
     private int id;
 
-    public Pokemon(String name, String types, String generation, String weight, String size, boolean visible) {
+    public Pokemon(int id, String name, String types, int generation, float weight, int size, boolean visible) {
+    	this.id = id;
     	this.name = name;
     	this.types = types;
     	this.generation = generation;
@@ -22,13 +23,13 @@ public class Pokemon {
     public void setTypes(String types) {
     	this.types = types;
     }
-    public void setGeneration(String generation) {
+    public void setGeneration(int generation) {
     	this.generation = generation;
     }
-    public void setWeight(String weight) {
+    public void setWeight(float weight) {
     	this.weight = weight;
     }
-    public void setSize(String size) {
+    public void setSize(int size) {
     	this.size = size;
     }
     public void setVisibility(boolean visibility) {
@@ -44,16 +45,16 @@ public class Pokemon {
     public String getTypes() {
     	return this.types;
     }
-    public String getGeneration() {
+    public int getGeneration() {
     	return this.generation;
     }
-    public String getWeight() {
+    public float getWeight() {
     	return this.weight;
     }
-    public String getSize() {
+    public int getSize() {
     	return this.size;
     }
-    public boolean getVisibility() {
+    public boolean isVisible() {
     	return this.visible;
     }
     public int getID() {

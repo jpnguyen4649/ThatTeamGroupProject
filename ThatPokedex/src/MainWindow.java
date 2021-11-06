@@ -2,24 +2,31 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
-import java.awt.Font;
-import javax.swing.JTextArea;
+import java.awt.GridBagConstraints;
+
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JScrollBar;
@@ -32,9 +39,11 @@ import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
+import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 
+// Renderer for list items.
 class PokemonCellRenderer extends JLabel implements ListCellRenderer {
 	private static final Color HIGHLIGHT_COLOR = new Color(0, 0, 128);
 	
@@ -49,10 +58,7 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer {
 		// TODO Auto-generated method stub
 		Pokemon pokemon = (Pokemon) value;
 		setText(pokemon.getName());
-		System.out.println(pokemon.getName());
-		System.out.println(pokemon.getVisibility());
-		if (pokemon.getVisibility() == false) {
-			System.out.println("INVISIBLE");
+		if (pokemon.isVisible() == false) {
 			setBackground(Color.red);
 			setForeground(Color.black);
 		}
@@ -70,6 +76,39 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer {
 }
 
 public class MainWindow extends JFrame {
+	
+	
+	GridBagConstraints gbc = new GridBagConstraints();
+	
+	// Filter GUI components.
+	JLabel filterLabel;
+	JLabel typeFilterLabel;
+	JComboBox<String> typeFilterCb;
+	JLabel genFilterLabel;
+	JComboBox<Integer> genFilterCb;
+	JLabel sizeFilterLabel;
+	JSlider sizeFilterSlider;
+	JLabel weightFilterLabel;
+	JSlider weightFilterSlider;
+	JButton applyFilterBtn;
+	
+	// List GUI components.
+	JScrollPane scrollPane;
+	JLabel sortLabel;
+	JComboBox<String> sortCb;
+	
+	// Search GUI components.
+	JLabel searchLabel;
+	JLabel nameLabel;
+	JTextField searchField;
+	JButton searchBtn;
+	
+	// Add, Archive, Select, Logout (Control) GUI components.
+	JButton addBtn;
+	JButton archiveBtn;
+	JButton aboutBtn;
+	JButton logoutBtn;
+	
 
 		/**
 		 * Launch the application.
@@ -94,16 +133,18 @@ public class MainWindow extends JFrame {
 		 * @throws SQLException 
 		 */
 	   public MainWindow() throws SQLException {
+		   
+		   // NOTE: We'll have to move this eventually, but for now I'm creating a database instance here.
 		   Database db = new Database();
 		   ArrayList<Pokemon> pokemonList = db.getPokemon();
-		   
-		   
+		   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		 
 		   DefaultListModel<Pokemon> model = new DefaultListModel<>();
 		   
 		   // ---- Refresh archived.
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   for (int i = 0; i < pokemonList.size(); i++) {
-			   if (pokemonList.get(i).getVisibility() == false) {
+			   if (pokemonList.get(i).isVisible() == false) {
 				   archived.add(pokemonList.get(i));
 				   continue;
 			   }
@@ -113,59 +154,177 @@ public class MainWindow extends JFrame {
 			   model.addElement(archived.get(i));
 		   }
 		   // ---- end refresh archived.
-
-		   setSize(500, 500);
-		   JButton btn = new JButton("Select");
-		   getContentPane().setLayout(new FlowLayout());
 		   
-		   JScrollPane scrollPane = new JScrollPane();
-		   scrollPane.setBounds(20, 21, 230, 307);
-		 
-		   
+ 
 		   JList<Pokemon> list = new JList(model);
 		   list.setCellRenderer(new PokemonCellRenderer());
+
 		   
-		   btn.addActionListener(new ActionListener() {
+		   // GUI designing.
+		   setSize(500, 670);
+		   Container mainContainer = this.getContentPane();
+		   mainContainer.setLayout(new GridBagLayout());
+		   gbc.insets = new Insets(5, 5, 5, 5);
+		   
+		   // List Panel.
+		   JPanel listPanel = new JPanel();
+		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));
+		   
+		   scrollPane = new JScrollPane();
+		   scrollPane.setViewportView(list);
+		   scrollPane.setPreferredSize(new Dimension(100, 150));
+		   
+		   JPanel sortPanel = new JPanel();
+		   sortPanel.setLayout(new FlowLayout(2, 4, 4));
+		   sortLabel = new JLabel("Sort");
+		   sortCb = new JComboBox<String>();
+		   sortPanel.add(sortLabel);
+		   sortPanel.add(sortCb);
+		   
+		   listPanel.add(scrollPane);
+		   listPanel.add(sortPanel);
+		   
+		   
+		   // Filter Panel.
+		   JPanel filterPanel = new JPanel();
+		   filterPanel.setLayout(new GridLayout(10, 1, 5, 5));
+		   filterLabel = new JLabel("Filter");
+		   typeFilterLabel = new JLabel("Type");
+		   genFilterLabel = new JLabel("Generation");
+		   sizeFilterLabel = new JLabel("Size");
+		   weightFilterLabel = new JLabel("Weight");
+		   
+		   typeFilterCb = new JComboBox<String>();
+		   genFilterCb = new JComboBox<Integer>();
+		   sizeFilterSlider = new JSlider();
+		   weightFilterSlider = new JSlider();
+		   applyFilterBtn = new JButton("Apply");
+		   filterPanel.add(filterLabel);
+		   filterPanel.add(typeFilterLabel);
+		   filterPanel.add(typeFilterCb);
+		   filterPanel.add(genFilterLabel);
+		   filterPanel.add(genFilterCb);
+		   filterPanel.add(sizeFilterLabel);
+		   filterPanel.add(sizeFilterSlider);
+		   filterPanel.add(weightFilterLabel);
+		   filterPanel.add(weightFilterSlider);
+		   filterPanel.add(applyFilterBtn);
+		   
+		   // Search Panel.
+		   JPanel searchPanel = new JPanel();
+		   searchPanel.setLayout(new GridLayout(2, 1, 5, 5));
+		   searchLabel = new JLabel("Search");
+		   
+		   JPanel searchBarPanel = new JPanel();
+		   searchBarPanel.setLayout(new FlowLayout(2, 0, 0));
+//		   nameLabel = new JLabel("Name: ");
+		   searchField = new JTextField("Name: ");
+		   searchBtn = new JButton("Search");
+		   
+//		   searchBarPanel.add(nameLabel);
+		   searchBarPanel.add(searchField);
+		   searchBarPanel.add(searchBtn); 
+		   
+		   searchPanel.add(searchLabel);
+		   searchPanel.add(searchBarPanel);
+		   
+		   // Control Panel.
+		   JPanel controlPanel = new JPanel();
+		   controlPanel.setLayout(new GridLayout(2,2,5,5));
+		   addBtn = new JButton("Add");
+		   archiveBtn = new JButton("Archive");
+		   aboutBtn = new JButton("About");
+		   logoutBtn = new JButton("Log Out");
+		   controlPanel.add(addBtn);
+		   controlPanel.add(archiveBtn);
+		   controlPanel.add(aboutBtn);
+		   controlPanel.add(logoutBtn);
+		   
+		   aboutBtn.addActionListener(new ActionListener() {
 	            @Override
 	            public void actionPerformed(ActionEvent e) {
-	            	int index = list.getSelectedIndex();
-	            	Pokemon pkm = list.getSelectedValue();
-	            	String sampleText = "Pokemon: " + pkm.getName() + "\nTypes: " + pkm.getTypes() + "\nGeneration: " + pkm.getGeneration() + "\nWeight: " + pkm.getWeight() + "\nSize: " + pkm.getSize();
-	                System.out.print(sampleText);
-	                // -- dialog class
-	                JDialog jd = new JDialog();
-	                jd.setBounds(500, 300, 400, 300);
-	                JLabel jLabel = new JLabel(sampleText);
-	                jd.add(jLabel);
-	                // -- end dialog class.
-//	            	JOptionPane.showMessageDialog(MainWindow.this, sampleText, "Hey", JOptionPane.INFORMATION_MESSAGE);
-	                jd.setVisible(true);
+	            	About about = new About(); 
+ 	                About.main(null);
 	            }
-	        });
-		   scrollPane.setViewportView(list);
-		   getContentPane().add(scrollPane);
-		   getContentPane().add(btn);
-			
-//		   initialize();
+		   });
+		   
+		   searchField.addFocusListener(new FocusListener() {
+			    public void focusGained(FocusEvent e) {
+			        searchField.setText("");
+			    }
+
+			    public void focusLost(FocusEvent e) {
+			        // nothing
+			    }
+			});
+		   
+		   archiveBtn.addActionListener(new ActionListener() {
+			   @Override
+			   public void actionPerformed(ActionEvent e) {
+				   Pokemon selected = list.getSelectedValue();
+				   if (selected == null) {
+					   JOptionPane.showMessageDialog(MainWindow.this, "Please select a Pokemon to archive");
+				   }
+				   else {
+					   try {
+						   db.archivePokemon(selected);
+						   JOptionPane.showMessageDialog(MainWindow.this, "Successfully archived Pokemon.");
+						   }
+					   catch(Exception e1) {
+						   JOptionPane.showMessageDialog(MainWindow.this, "Error in archving Pokemon. Please try again.");
+					   }
+				   }
+			   }
+		   });
+		   
+		   addBtn.addActionListener(new ActionListener() {
+			   @Override 
+			   public void actionPerformed(ActionEvent e) {
+				   Add add = new Add();
+				   Add.main(null);
+				   
+			   }
+		   });
+		   
+		   list.addMouseListener(new MouseAdapter() {
+			    public void mouseClicked(MouseEvent evt) {
+			        if (evt.getClickCount() == 2) {
+			            Pokemon selected = list.getSelectedValue();
+			            String sampleText = "Pokemon: " + selected.getName() + "\nTypes: " + selected.getTypes() + "\nGeneration: " + selected.getGeneration() + "\nWeight: " + selected.getWeight() + "\nSize: " + selected.getSize();
+		            	JOptionPane.showMessageDialog(MainWindow.this, sampleText, selected.getName(), JOptionPane.INFORMATION_MESSAGE);
+		                
+			            
+			        } 
+			    }
+			});
+		   
+		   gbc.gridx = 0;
+		   gbc.gridy = 0;
+		   gbc.gridheight = 2;
+		   gbc.fill = GridBagConstraints.VERTICAL;
+		   gbc.gridwidth = 2;
+		   gbc.fill = GridBagConstraints.HORIZONTAL;
+		   getContentPane().add(listPanel,gbc);
+		   gbc.gridx = 2;
+		   gbc.gridy = 0;
+		   gbc.gridwidth = 1;
+		   gbc.fill = GridBagConstraints.HORIZONTAL;
+		   getContentPane().add(filterPanel,gbc);
+		   gbc.gridx = 0;
+		   gbc.gridy = 2;
+		   gbc.gridheight = 1;
+		   gbc.fill = GridBagConstraints.VERTICAL;
+		   gbc.gridwidth = 2;
+		   gbc.fill = GridBagConstraints.HORIZONTAL;
+		   getContentPane().add(searchPanel,gbc);
+		   gbc.gridx = 2;
+		   gbc.gridy = 2;
+		   gbc.gridwidth = 1;
+		   gbc.fill = GridBagConstraints.HORIZONTAL;
+		   getContentPane().add(controlPanel,gbc);
+		   
+		   
+		
 	   }
 
-		/**
-		 * Initialize the contents of the frame.
-		 */
-	   private void initialize() {
-//		   frmThatPokedex = new JFrame("That Pokedex");
-//		   JPanel p = new JPanel();
-//		   setLayout(new BoxLayout(p, BoxLayout.X_AXIS));
-//		   frmThatPokedex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//		   frmThatPokedex.add(new JButton("hi"));
-//		   frmThatPokedex.add(new JButton("bye"));
-//		   frmThatPokedex.setSize(500, 500);
-		   
-//	      frmThatPokedex = new JFrame();
-//	      frmThatPokedex.setTitle("That Pokedex - Admin");
-//	      frmThatPokedex.setBounds(100, 100, 579, 576);
-//	      frmThatPokedex.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//	      frmThatPokedex.getContentPane().setLayout(null);
-	   
-	   }
 }
