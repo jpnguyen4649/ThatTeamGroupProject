@@ -3,6 +3,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 
 import java.awt.Font;
 import javax.swing.JTextPane;
@@ -12,15 +13,19 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
-
+/**
+ * This class implements a pop up frame where admins can enter information about a Pokemon to be added into the database.
+ * @author rachelmao
+ *
+ */
 public class Add {
 
 	private JFrame frmThatAdd;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
-	private JTextField textField_4;
+	private JTextField nameField;
+	private JTextField typeField;
+	private JTextField genField;
+	private JTextField weightField;
+	private JTextField sizeField;
 
 	/**
 	 * Launch the application.
@@ -40,15 +45,19 @@ public class Add {
 	
 	/**
 	 * Create the application.
+	 * @throws SQLException 
 	 */
-	public Add() {
+	public Add() throws SQLException {
 		initialize();
 	}
 
 	/**
 	 * Initialize the contents of the frame.
+	 * @throws SQLException 
 	 */
-	private void initialize() {
+	private void initialize() throws SQLException {
+		Database db = Database.getInstance();
+		
 		frmThatAdd = new JFrame();
 		frmThatAdd.setTitle("That Add");
 		frmThatAdd.setBounds(100, 100, 450, 300);
@@ -80,36 +89,79 @@ public class Add {
 		lblSize.setBounds(48, 145, 89, 35);
 		frmThatAdd.getContentPane().add(lblSize);
 		
-		textField = new JTextField();
-		textField.setBounds(135, 31, 188, 19);
-		frmThatAdd.getContentPane().add(textField);
-		textField.setColumns(10);
+		nameField = new JTextField();
+		nameField.setBounds(135, 31, 188, 19);
+		frmThatAdd.getContentPane().add(nameField);
+		nameField.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(135, 62, 188, 19);
-		frmThatAdd.getContentPane().add(textField_1);
+		typeField = new JTextField();
+		typeField.setColumns(10);
+		typeField.setBounds(135, 62, 188, 19);
+		frmThatAdd.getContentPane().add(typeField);
 		
-		textField_2 = new JTextField();
-		textField_2.setColumns(10);
-		textField_2.setBounds(135, 93, 188, 19);
-		frmThatAdd.getContentPane().add(textField_2);
+		genField = new JTextField();
+		genField.setColumns(10);
+		genField.setBounds(135, 93, 188, 19);
+		frmThatAdd.getContentPane().add(genField);
 		
-		textField_3 = new JTextField();
-		textField_3.setColumns(10);
-		textField_3.setBounds(135, 125, 188, 19);
-		frmThatAdd.getContentPane().add(textField_3);
+		weightField = new JTextField();
+		weightField.setColumns(10);
+		weightField.setBounds(135, 125, 188, 19);
+		frmThatAdd.getContentPane().add(weightField);
 		
-		textField_4 = new JTextField();
-		textField_4.setColumns(10);
-		textField_4.setBounds(135, 155, 188, 19);
-		frmThatAdd.getContentPane().add(textField_4);
-		
-		DefaultListModel model = new DefaultListModel();
+		sizeField = new JTextField();
+		sizeField.setColumns(10);
+		sizeField.setBounds(135, 155, 188, 19);
+		frmThatAdd.getContentPane().add(sizeField);
 		
 		JButton btnNewButton = new JButton("Add");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// Check that text field values are valid.
+				boolean validName = true;
+				boolean validType = true;
+				boolean validGeneration = true;
+				boolean validWeight = true;
+				boolean validSize = true;
+				
+				String name = nameField.getText();
+				String type = typeField.getText();
+				int gen = 0;
+				float weight = 0;
+				int size = 0;
+				try {
+					gen = Integer.parseInt(genField.getText());
+				}
+				catch (NumberFormatException nfe) {
+					
+				}
+				try {
+					weight = Float.parseFloat(weightField.getText());
+				}
+				catch (NumberFormatException nfe) {
+					
+				}
+				try {
+					size = Integer.parseInt(sizeField.getText());
+				}
+				catch (NumberFormatException nfe){
+					
+				}
+				// All fields are valid.
+				if (validName && validType && validGeneration && validWeight && validSize == true) {
+					Pokemon pokemon = new Pokemon(name, type, gen, weight, size, true);
+					if (db.addPokemon(pokemon)) {
+						JOptionPane.showMessageDialog(frmThatAdd, "Successfully added Pokemon.");
+						frmThatAdd.dispose();
+					}
+					else {
+						JOptionPane.showMessageDialog(frmThatAdd, "Error in adding Pokemon. Please try again.");
+					}
+				}
+				// Fields have error.
+				else {
+					
+				}
 				
 			}
 		});
@@ -121,13 +173,6 @@ public class Add {
 		JButton btnCancdel = new JButton("Back");
 		btnCancdel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				try {
-					ThatPokedexAdmin admin = new ThatPokedexAdmin();
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} 
-				ThatPokedexAdmin.main(null);
 				frmThatAdd.dispose();
 			}
 		});
@@ -139,11 +184,11 @@ public class Add {
 		JButton btnReset = new JButton("Reset");
 		btnReset.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				textField.setText(null);
-				textField_1.setText(null);
-				textField_2.setText(null);
-				textField_3.setText(null);
-				textField_4.setText(null);
+				nameField.setText(null);
+				typeField.setText(null);
+				genField.setText(null);
+				weightField.setText(null);
+				sizeField.setText(null);
 			}
 		});
 		btnReset.setFont(new Font("Tahoma", Font.PLAIN, 14));

@@ -12,6 +12,11 @@ import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.awt.event.ActionEvent;
 
+/**
+ * This class implements the Login window.
+ * @author rachelmao
+ *
+ */
 public class Login {
 	
 	private JFrame frmThatPokedexLogin;
@@ -44,6 +49,9 @@ public class Login {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		// Sign User out.
+		User.getInstance().setAccessLevel(-1);
+		
 		frmThatPokedexLogin = new JFrame();
 		frmThatPokedexLogin.setTitle("That Pokedex Login");
 		frmThatPokedexLogin.setBounds(200, 200, 500, 300);
@@ -75,25 +83,29 @@ public class Login {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String password = txtPassword.getText();
-				
 				if(password.equals("thatteam")) { //This is for the user's password
 					txtPassword.setText(null);
-					
-					ThatPokedex database = new ThatPokedex(); //user's pokedex database pops up
-					ThatPokedex.main(null);
+					User.getInstance().setAccessLevel(0);
 					frmThatPokedexLogin.dispose();
+					try {
+						MainWindow mw = new MainWindow();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					MainWindow.main(null);
 				}
 				
 				else if(password.equals("root")) { //This is for the admin's password
 					txtPassword.setText(null);
-					
+					User.getInstance().setAccessLevel(1);
 					try {
-						ThatPokedexAdmin admin = new ThatPokedexAdmin();
+						MainWindow mw = new MainWindow();
 					} catch (SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					} //admin's pokedex database pops up
-					ThatPokedexAdmin.main(null);
+					}
+					MainWindow.main(null);
 					frmThatPokedexLogin.dispose();
 				}
 				

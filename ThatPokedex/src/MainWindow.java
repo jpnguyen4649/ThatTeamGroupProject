@@ -43,8 +43,12 @@ import javax.swing.JSlider;
 import javax.swing.JSplitPane;
 import javax.swing.JPanel;
 
-// Renderer for list items.
-class PokemonCellRenderer extends JLabel implements ListCellRenderer {
+/**
+ * This class renders the items in the JList containing Pokemon objects.
+ * @author rachelmao
+ *
+ */
+class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
 	private static final Color HIGHLIGHT_COLOR = new Color(0, 0, 128);
 	
 	public PokemonCellRenderer() {
@@ -75,9 +79,16 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer {
 	
 }
 
+/**
+ * This class implements the main window of the Pokedex.
+ * @author rachelmao
+ *
+ */
 public class MainWindow extends JFrame {
 	
-	
+	boolean isAdmin;
+	ArrayList<Pokemon> pokemonList;
+	DefaultListModel<Pokemon> model;
 	GridBagConstraints gbc = new GridBagConstraints();
 	
 	// Filter GUI components.
@@ -126,22 +137,12 @@ public class MainWindow extends JFrame {
 	            }
 	         });
 	   }
-		
-		
-		/**
-		 * Create the application.
-		 * @throws SQLException 
-		 */
-	   public MainWindow() throws SQLException {
-		   
-		   // NOTE: We'll have to move this eventually, but for now I'm creating a database instance here.
-		   Database db = new Database();
-		   ArrayList<Pokemon> pokemonList = db.getPokemon();
-		   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		 
-		   DefaultListModel<Pokemon> model = new DefaultListModel<>();
-		   
-		   // ---- Refresh archived.
+	
+	   /**
+	    * This method refreshes the Pokemon list display so that archived Pokemon appear at the bottom.
+	    */
+	   public void refreshArchived() {
+		   model.removeAllElements();
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   for (int i = 0; i < pokemonList.size(); i++) {
 			   if (pokemonList.get(i).isVisible() == false) {
@@ -150,13 +151,35 @@ public class MainWindow extends JFrame {
 			   }
 			   model.addElement(pokemonList.get(i));
 		   }
-		   for (int i = 0; i < archived.size(); i++) {
-			   model.addElement(archived.get(i));
+		   if (isAdmin) {
+			   for (int i = 0; i < archived.size(); i++) {
+				   model.addElement(archived.get(i));
+			   }
 		   }
-		   // ---- end refresh archived.
+	   }
+		
+		/**
+		 * Create the application.
+		 * @throws SQLException 
+		 */
+	   public MainWindow() throws SQLException {
+		   
+		   
+		   Database db = Database.getInstance();
+		   pokemonList = db.getPokemon();
+		   
+		   // Set accessLevel.
+		   User user = User.getInstance();
+		   if (user.getAccessLevel() == 1) isAdmin = true;
+		   else isAdmin = false;
+		   
+		   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		   model = new DefaultListModel<>();
+		   refreshArchived();
 		   
  
-		   JList<Pokemon> list = new JList(model);
+		   JList<Pokemon> list = new JList<Pokemon>(model);
 		   list.setCellRenderer(new PokemonCellRenderer());
 
 		   
@@ -235,8 +258,10 @@ public class MainWindow extends JFrame {
 		   archiveBtn = new JButton("Archive");
 		   aboutBtn = new JButton("About");
 		   logoutBtn = new JButton("Log Out");
-		   controlPanel.add(addBtn);
-		   controlPanel.add(archiveBtn);
+		   if (isAdmin) {
+			   controlPanel.add(addBtn);
+			   controlPanel.add(archiveBtn);
+		   }
 		   controlPanel.add(aboutBtn);
 		   controlPanel.add(logoutBtn);
 		   
@@ -266,11 +291,11 @@ public class MainWindow extends JFrame {
 					   JOptionPane.showMessageDialog(MainWindow.this, "Please select a Pokemon to archive");
 				   }
 				   else {
-					   try {
-						   db.archivePokemon(selected);
+					   if (db.archivePokemon(selected)) {
 						   JOptionPane.showMessageDialog(MainWindow.this, "Successfully archived Pokemon.");
-						   }
-					   catch(Exception e1) {
+						   refreshArchived();
+					   }
+					   else {
 						   JOptionPane.showMessageDialog(MainWindow.this, "Error in archving Pokemon. Please try again.");
 					   }
 				   }
@@ -280,19 +305,42 @@ public class MainWindow extends JFrame {
 		   addBtn.addActionListener(new ActionListener() {
 			   @Override 
 			   public void actionPerformed(ActionEvent e) {
-				   Add add = new Add();
-				   Add.main(null);
+				   try {
+					new Add();
+					Add.main(null);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				   
 				   
 			   }
 		   });
+		   
+		   logoutBtn.addActionListener(new ActionListener() {
+               @Override
+               public void actionPerformed(ActionEvent e) {
+                   if(JOptionPane.showConfirmDialog(logoutBtn, "Confirm if you want to log out", "That Pokedex",
+                           JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                              Login login = new Login(); 
+                              Login.main(null);
+                              dispose();
+                   }    
+               }
+           });
 		   
 		   list.addMouseListener(new MouseAdapter() {
 			    public void mouseClicked(MouseEvent evt) {
 			        if (evt.getClickCount() == 2) {
 			            Pokemon selected = list.getSelectedValue();
 			            String sampleText = "Pokemon: " + selected.getName() + "\nTypes: " + selected.getTypes() + "\nGeneration: " + selected.getGeneration() + "\nWeight: " + selected.getWeight() + "\nSize: " + selected.getSize();
-		            	JOptionPane.showMessageDialog(MainWindow.this, sampleText, selected.getName(), JOptionPane.INFORMATION_MESSAGE);
-		                
+//		            	JOptionPane.showMessageDialog(MainWindow.this, sampleText, selected.getName(), JOptionPane.INFORMATION_MESSAGE);
+		                try {
+							new View(selected);
+						} catch (SQLException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 			            
 			        } 
 			    }
