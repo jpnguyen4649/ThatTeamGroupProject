@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -120,7 +121,6 @@ public class MainWindow extends JFrame {
 	JButton aboutBtn;
 	JButton logoutBtn;
 	
-
 		/**
 		 * Launch the application.
 		 */
@@ -137,6 +137,8 @@ public class MainWindow extends JFrame {
 	            }
 	         });
 	   }
+	   
+	   
 	
 	   /**
 	    * This method refreshes the Pokemon list display so that archived Pokemon appear at the bottom.
@@ -163,8 +165,6 @@ public class MainWindow extends JFrame {
 		 * @throws SQLException 
 		 */
 	   public MainWindow() throws SQLException {
-		   
-		   
 		   Database db = Database.getInstance();
 		   pokemonList = db.getPokemon();
 		   
@@ -184,25 +184,30 @@ public class MainWindow extends JFrame {
 
 		   
 		   // GUI designing.
-		   setSize(500, 670);
+		   setSize(400, 450);
+		   setTitle("That Pokedex");
 		   Container mainContainer = this.getContentPane();
 		   mainContainer.setLayout(new GridBagLayout());
 		   gbc.insets = new Insets(5, 5, 5, 5);
 		   
 		   // List Panel.
 		   JPanel listPanel = new JPanel();
-		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));
+		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));  
 		   
 		   scrollPane = new JScrollPane();
 		   scrollPane.setViewportView(list);
 		   scrollPane.setPreferredSize(new Dimension(100, 150));
 		   
 		   JPanel sortPanel = new JPanel();
-		   sortPanel.setLayout(new FlowLayout(2, 4, 4));
-		   sortLabel = new JLabel("Sort");
-		   sortCb = new JComboBox<String>();
+		   sortPanel.setLayout(new FlowLayout(3, 4, 4));
+		   sortLabel = new JLabel("Sort:");
+		   sortLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		   
+		   String[] choices = {"Select One", "Alphabetically", "Type", "Generation", "Size", "Weight"};
+		   sortCb = new JComboBox<String>(choices);
 		   sortPanel.add(sortLabel);
 		   sortPanel.add(sortCb);
+		   
 		   
 		   listPanel.add(scrollPane);
 		   listPanel.add(sortPanel);
@@ -211,7 +216,8 @@ public class MainWindow extends JFrame {
 		   // Filter Panel.
 		   JPanel filterPanel = new JPanel();
 		   filterPanel.setLayout(new GridLayout(10, 1, 5, 5));
-		   filterLabel = new JLabel("Filter");
+		   filterLabel = new JLabel("Filter:");
+		   filterLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		   typeFilterLabel = new JLabel("Type");
 		   genFilterLabel = new JLabel("Generation");
 		   sizeFilterLabel = new JLabel("Size");
@@ -236,13 +242,38 @@ public class MainWindow extends JFrame {
 		   // Search Panel.
 		   JPanel searchPanel = new JPanel();
 		   searchPanel.setLayout(new GridLayout(2, 1, 5, 5));
-		   searchLabel = new JLabel("Search");
-		   
+		   searchLabel = new JLabel("Search:");
+		   searchLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		   JPanel searchBarPanel = new JPanel();
-		   searchBarPanel.setLayout(new FlowLayout(2, 0, 0));
+		   searchBarPanel.setLayout(new FlowLayout(2, 1, 0));
 //		   nameLabel = new JLabel("Name: ");
-		   searchField = new JTextField("Name: ");
+		   searchField = new JTextField("Name: ", 8);
+		   
 		   searchBtn = new JButton("Search");
+		   searchBtn.addActionListener(new ActionListener() {
+			   public void actionPerformed(ActionEvent e) {
+				   try {
+					   String search = searchField.getText();
+					   if(search.equals("")||search.equals("Name: ")) {
+						   JOptionPane.showMessageDialog(null, "Please type in a Pokemon name.", "Try Again", JOptionPane.ERROR_MESSAGE);
+					   }else {
+			           int index = list.getNextMatch(search, 0, javax.swing.text.Position.Bias.Forward);
+			           Pokemon selected = model.getElementAt(index);
+					   if(index!=-1) {
+			                try {
+								new View(selected);
+							} catch (SQLException f) {
+								f.printStackTrace();
+							}
+				            
+					   }
+					   }
+				   }catch (Exception q) {
+					   JOptionPane.showMessageDialog(null, "Pokemon not found. Please try again.", "Try Again", JOptionPane.ERROR_MESSAGE);
+				   }
+				} 
+			}
+			);
 		   
 //		   searchBarPanel.add(nameLabel);
 		   searchBarPanel.add(searchField);
@@ -371,8 +402,6 @@ public class MainWindow extends JFrame {
 		   gbc.fill = GridBagConstraints.HORIZONTAL;
 		   getContentPane().add(controlPanel,gbc);
 		   
-		   
-		
 	   }
 
 }
