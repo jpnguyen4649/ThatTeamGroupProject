@@ -246,7 +246,6 @@ public class MainWindow extends JFrame {
 		   searchLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		   JPanel searchBarPanel = new JPanel();
 		   searchBarPanel.setLayout(new FlowLayout(2, 1, 0));
-//		   nameLabel = new JLabel("Name: ");
 		   searchField = new JTextField("Name: ", 8);
 		   
 		   searchBtn = new JButton("Search");
