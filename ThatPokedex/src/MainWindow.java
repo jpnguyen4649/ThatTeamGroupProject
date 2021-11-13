@@ -256,16 +256,18 @@ public class MainWindow extends JFrame {
 					   if(search.equals("")||search.equals("Name: ")) {
 						   JOptionPane.showMessageDialog(null, "Please type in a Pokemon name.", "Try Again", JOptionPane.ERROR_MESSAGE);
 					   }else {
-			           int index = list.getNextMatch(search, 0, javax.swing.text.Position.Bias.Forward);
-			           Pokemon selected = model.getElementAt(index);
-					   if(index!=-1) {
-			                try {
-								new View(selected);
-							} catch (SQLException f) {
-								f.printStackTrace();
-							}
-				            
-					   }
+				           int index = list.getNextMatch(search, 0, javax.swing.text.Position.Bias.Forward);
+				           Pokemon selected = model.getElementAt(index);
+						   if(index!=-1 && selected.getName().equalsIgnoreCase(search)) {
+				                try {
+									new View(selected);
+								} catch (SQLException f) {
+									f.printStackTrace();
+								}
+					            
+						   }else {
+							   JOptionPane.showMessageDialog(null, "Pokemon not found. Please try again.", "Try Again", JOptionPane.ERROR_MESSAGE);
+						   }
 					   }
 				   }catch (Exception q) {
 					   JOptionPane.showMessageDialog(null, "Pokemon not found. Please try again.", "Try Again", JOptionPane.ERROR_MESSAGE);
