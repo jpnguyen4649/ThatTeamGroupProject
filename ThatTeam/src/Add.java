@@ -173,7 +173,15 @@ public class Add {
 		JButton btnCancdel = new JButton("Back");
 		btnCancdel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				try {
+					MainWindow main = new MainWindow();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+	            MainWindow.main(null);
 				frmThatAdd.dispose();
+				
 			}
 		});
 		btnCancdel.setFont(new Font("Tahoma", Font.PLAIN, 14));

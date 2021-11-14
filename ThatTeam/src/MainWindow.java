@@ -184,7 +184,7 @@ public class MainWindow extends JFrame {
 
 		   
 		   // GUI designing.
-		   setSize(400, 450);
+		   setSize(450, 450);
 		   setTitle("That Pokedex");
 		   Container mainContainer = this.getContentPane();
 		   mainContainer.setLayout(new GridBagLayout());
@@ -192,7 +192,7 @@ public class MainWindow extends JFrame {
 		   
 		   // List Panel.
 		   JPanel listPanel = new JPanel();
-		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));
+		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));  
 		   
 		   scrollPane = new JScrollPane();
 		   scrollPane.setViewportView(list);
@@ -250,6 +250,32 @@ public class MainWindow extends JFrame {
 		   searchField = new JTextField("Name: ", 8);
 		   
 		   searchBtn = new JButton("Search");
+		   
+		   searchBtn.addActionListener(new ActionListener() {
+			   public void actionPerformed(ActionEvent e) {
+				   try {
+					   String search = searchField.getText();
+					   if(search.equals("")||search.equals("Name: ")) {
+						   JOptionPane.showMessageDialog(null, "Please type in a Pokemon name.", "Try Again", JOptionPane.ERROR_MESSAGE);
+					   }else {
+						   int index = list.getNextMatch(search, 0, javax.swing.text.Position.Bias.Forward);
+				           Pokemon selected = model.getElementAt(index);
+						   if(index!=-1 && selected.getName().equalsIgnoreCase(search)) {
+				                try {
+									new View(selected);
+								} catch (SQLException f) {
+									f.printStackTrace();
+								}
+
+						   }else {
+							   JOptionPane.showMessageDialog(null, "Pokemon not found. Please try again.", "Try Again", JOptionPane.ERROR_MESSAGE);
+						   }
+					   }
+				   }catch (Exception q) {
+					   JOptionPane.showMessageDialog(null, "Pokemon not found. Please try again.", "Try Again", JOptionPane.ERROR_MESSAGE);
+				   }
+				} 
+			});
 		   
 //		   searchBarPanel.add(nameLabel);
 		   searchBarPanel.add(searchField);
@@ -315,6 +341,7 @@ public class MainWindow extends JFrame {
 				   try {
 					new Add();
 					Add.main(null);
+					dispose();
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -378,8 +405,6 @@ public class MainWindow extends JFrame {
 		   gbc.fill = GridBagConstraints.HORIZONTAL;
 		   getContentPane().add(controlPanel,gbc);
 		   
-		   
-		
 	   }
 
 }
