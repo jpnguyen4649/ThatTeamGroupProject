@@ -30,6 +30,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
@@ -99,9 +100,11 @@ public class MainWindow extends JFrame {
 	JLabel genFilterLabel;
 	JComboBox<Integer> genFilterCb;
 	JLabel sizeFilterLabel;
-	JSlider sizeFilterSlider;
+	JComboBox<Double> sizeFilterCb;
+	//JSlider sizeFilterSlider;
 	JLabel weightFilterLabel;
-	JSlider weightFilterSlider;
+	//JSlider weightFilterSlider;
+	JComboBox<Double> weightFilterCb;
 	JButton applyFilterBtn;
 	
 	// List GUI components.
@@ -225,8 +228,10 @@ public class MainWindow extends JFrame {
 		   
 		   typeFilterCb = new JComboBox<String>();
 		   genFilterCb = new JComboBox<Integer>();
-		   sizeFilterSlider = new JSlider();
-		   weightFilterSlider = new JSlider();
+		   sizeFilterCb = new JComboBox<Double>();
+		   //sizeFilterSlider = new JSlider();
+		   weightFilterCb = new JComboBox<Double>();
+		   //weightFilterSlider = new JSlider();
 		   applyFilterBtn = new JButton("Apply");
 		   filterPanel.add(filterLabel);
 		   filterPanel.add(typeFilterLabel);
@@ -234,10 +239,24 @@ public class MainWindow extends JFrame {
 		   filterPanel.add(genFilterLabel);
 		   filterPanel.add(genFilterCb);
 		   filterPanel.add(sizeFilterLabel);
-		   filterPanel.add(sizeFilterSlider);
+		   //filterPanel.add(sizeFilterSlider);
+		   filterPanel.add(sizeFilterCb);
 		   filterPanel.add(weightFilterLabel);
-		   filterPanel.add(weightFilterSlider);
+		   filterPanel.add(weightFilterCb);
+		   //filterPanel.add(weightFilterSlider);
 		   filterPanel.add(applyFilterBtn);
+		   
+		   
+		   typeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "Bug", "Bug, Fairy", "Bug, Flying", "Bug, Poison", "Dark", "Dragon", "Dragon, Psychic", "Electric", "Electric, Poison", "Fairy", "Fighting", "Fire", "Ghost ", "Ghost, Grass", "Grass", "Grass, Dragon", "Grass, Flying", "Grass, Poison", "Ground", "Ground, Psychic", "Ice", "Ice, Water", "Normal", "Normal, Fairy", "Normal, Flying", "Poison", "Poison, Flying", "Poison, Water", "Psychic", "Psychic, Fairy", "Psychic, Fire", "Psychic, Flying", "Psychic, Grass", "Rock", "Rock, Bug", "Rock, Fairy", "Rock, Grass", "Rock, Ground", "Rock, Ice", "Water", "Water, Electric", "Water, Fairy", "Water, Ground", "Water, Psychic"}));
+		   genFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "Generation 1", "Generation 2", "Generation 3", "Generation 4", "Generation 5", "Generation 6", "Generation 7", "Generation 8"}));
+		   sizeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "~ 0 ft.", "~ 1 ft.", "~ 2 ft.", "~ 3 ft.", "> 3 ft."}));
+		   weightFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
+		   
+		   applyFilterBtn.addActionListener(new ActionListener() {
+			   public void actionPerformed(ActionEvent e) {
+				   
+			   }
+		   });
 		   
 		   // Search Panel.
 		   JPanel searchPanel = new JPanel();
