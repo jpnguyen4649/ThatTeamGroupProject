@@ -18,7 +18,9 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.GridBagConstraints;
@@ -250,11 +252,12 @@ public class MainWindow extends JFrame {
 		   typeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "Bug", "Bug, Fairy", "Bug, Flying", "Bug, Poison", "Dark", "Dragon", "Dragon, Psychic", "Electric", "Electric, Poison", "Fairy", "Fighting", "Fire", "Ghost ", "Ghost, Grass", "Grass", "Grass, Dragon", "Grass, Flying", "Grass, Poison", "Ground", "Ground, Psychic", "Ice", "Ice, Water", "Normal", "Normal, Fairy", "Normal, Flying", "Poison", "Poison, Flying", "Poison, Water", "Psychic", "Psychic, Fairy", "Psychic, Fire", "Psychic, Flying", "Psychic, Grass", "Rock", "Rock, Bug", "Rock, Fairy", "Rock, Grass", "Rock, Ground", "Rock, Ice", "Water", "Water, Electric", "Water, Fairy", "Water, Ground", "Water, Psychic"}));
 		   genFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "Generation 1", "Generation 2", "Generation 3", "Generation 4", "Generation 5", "Generation 6", "Generation 7", "Generation 8"}));
 		   sizeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "~ 0 ft.", "~ 1 ft.", "~ 2 ft.", "~ 3 ft.", "> 3 ft."}));
-		   weightFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
+		   weightFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "40 - 50 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
 		   
+		   ArrayList <Filter> filters = new ArrayList<>();
 		   applyFilterBtn.addActionListener(new ActionListener() {
 			   public void actionPerformed(ActionEvent e) {
-				   
+				   db.filterPokemon(filters);			     
 			   }
 		   });
 		   

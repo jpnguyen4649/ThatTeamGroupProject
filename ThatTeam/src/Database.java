@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -55,6 +56,102 @@ public class Database {
         	  e.printStackTrace();
           }
    }
+   
+   
+   public void filterPokemon(ArrayList<Filter> filters) {
+	   try(
+			   Statement stmt = conn.createStatement();
+	      ) {
+		   	 //get all the selected filters
+		     //create a filter for each selected filter
+			 
+			 //Generation filters
+			 GenerationFilter gf = new GenerationFilter(1, "=");
+			 GenerationFilter gf2 = new GenerationFilter(2, "=");
+			 GenerationFilter gf3 = new GenerationFilter(3, "=");
+			 GenerationFilter gf4 = new GenerationFilter(4, "=");
+			 GenerationFilter gf5 = new GenerationFilter(5, "=");
+			 GenerationFilter gf6 = new GenerationFilter(6, "=");
+			 GenerationFilter gf7 = new GenerationFilter(7, "=");
+			 GenerationFilter gf8 = new GenerationFilter(8, "=");
+			 
+			 //Size filters 
+			 SizeFilter sf = new SizeFilter(1, ">"); // ~ 0
+			 SizeFilter sf1 = new SizeFilter(2, ">"); // ~ 1
+			 SizeFilter sf2 = new SizeFilter(3, ">"); // ~ 2
+			 SizeFilter sf3 = new SizeFilter(4, ">"); // ~ 3
+			 SizeFilter sf4 = new SizeFilter(4, "<"); // 3 < 
+			 
+			 //Weight filters
+			 WeightFilter wf = new WeightFilter(80.0f, "<"); // 80+
+			 WeightFilter wf2 = new WeightFilter(80.0f, ">"); // 70+
+			 WeightFilter wf3 = new WeightFilter(70.0f, ">"); // 60+
+			 WeightFilter wf4 = new WeightFilter(60.0f, ">"); // 50+
+			 WeightFilter wf5 = new WeightFilter(50.0f, ">"); // 40+
+			 WeightFilter wf6 = new WeightFilter(40.0f, ">"); // 30+
+			 WeightFilter wf7 = new WeightFilter(30.0f, ">"); // 20+
+			 WeightFilter wf8 = new WeightFilter(20.0f, ">"); // 10+
+			 WeightFilter wf9 = new WeightFilter(10.0f, ">"); // 0+
+			 
+			 //Type filters 
+			 TypeFilter tf = new TypeFilter("Electric", "LIKE");
+			 TypeFilter tf2 = new TypeFilter("Water", "LIKE");
+			 TypeFilter tf3 = new TypeFilter("Fire", "LIKE");
+			 TypeFilter tf4 = new TypeFilter("Ground", "LIKE");
+			 TypeFilter tf5 = new TypeFilter("Psychic", "LIKE");
+			 TypeFilter tf6 = new TypeFilter("Fairy", "LIKE");
+			 TypeFilter tf7 = new TypeFilter("Bug", "LIKE");
+			 TypeFilter tf8 = new TypeFilter("Flying", "LIKE");
+			 TypeFilter tf9 = new TypeFilter("Poison", "LIKE");
+			 TypeFilter tf10 = new TypeFilter("Dark", "LIKE");
+			 TypeFilter tf11 = new TypeFilter("Dragon", "LIKE");
+			 TypeFilter tf12 = new TypeFilter("Fighting", "LIKE");
+			 TypeFilter tf13 = new TypeFilter("Ghost", "LIKE");
+			 TypeFilter tf14 = new TypeFilter("Grass", "LIKE");
+			 TypeFilter tf15 = new TypeFilter("Ice", "LIKE");
+			 TypeFilter tf16 = new TypeFilter("Normal", "LIKE");
+			 TypeFilter tf17 = new TypeFilter("Rock", "LIKE");
+			 
+			 String statement = "SELECT * FROM pokemon_database WHERE ";
+			 
+			 ArrayList<TypeFilter> selected_types = new ArrayList<>(Arrays.asList(tf, tf2, tf3, tf4, tf5, tf6, tf7, tf8, tf9, tf10, tf11, tf12, tf13, tf14, tf15, tf16, tf17));
+		
+		     for (int i = 0; i < selected_types.size(); i++) {
+		        filters.add(new TypeFilter(statement, selected_types.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put
+		     }
+			 
+		     ArrayList<GenerationFilter> selected_generations = new ArrayList<>(Arrays.asList(gf, gf2, gf3, gf4, gf5, gf6, gf7, gf8));
+				
+		     for (int i = 0; i < selected_generations.size(); i++) {
+		        filters.add(new TypeFilter(statement, selected_generations.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put 
+		     }
+		     
+		     ArrayList<SizeFilter> selected_sizes = new ArrayList<>(Arrays.asList(sf, sf1, sf2, sf3, sf4));
+				
+		     for (int i = 0; i < selected_sizes.size(); i++) {
+		        filters.add(new TypeFilter(statement, selected_sizes.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put 
+		     }
+		     
+		     ArrayList<WeightFilter> selected_weights = new ArrayList<>(Arrays.asList(wf, wf2, wf3, wf4, wf5, wf6, wf7, wf8, wf9));
+				
+		     for (int i = 0; i < selected_weights.size(); i++) {
+		        filters.add(new TypeFilter(statement, selected_weights.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put 
+		     }
+			 
+			 for (int i = 0; i < filters.size(); i++) {
+		        statement = statement + " AND " + filters.get(i).getQueryComponent();
+		     }
+			 
+		     PreparedStatement pstmt = conn.prepareStatement(statement);
+		     
+		     for (int i = 0; i < filters.size(); i++) {
+		        filters.get(i).setInPreparedStatement(pstmt, i+1);
+		     }
+	   } catch (SQLException e){
+     	  e.printStackTrace();
+       }
+   }
+   
    
    /**
     * This method updates the value of a pokemon in the Database.
