@@ -114,6 +114,7 @@ public class MainWindow extends JFrame {
 	JLabel sortLabel;
 	JComboBox<String> sortCb;
 	
+	
 	// Search GUI components.
 	JLabel searchLabel;
 	JLabel nameLabel;
@@ -163,6 +164,105 @@ public class MainWindow extends JFrame {
 				   model.addElement(archived.get(i));
 			   }
 		   }
+	   }
+	   
+// refresh the sorted Pokemon list
+	   
+	   public void refreshSortedA() throws SQLException{
+		   model.removeAllElements();
+		   Database db = Database.getInstance();
+		   ArrayList<Pokemon> archived = new ArrayList<>();
+		   ArrayList<Pokemon> sorted = new ArrayList<>();		   
+		   sorted = db.sortedAlphabetically();		   
+		   for (int i = 0; i < sorted.size(); i++) {
+			   if (sorted.get(i).isVisible() == false) {
+				   archived.add(sorted.get(i));
+				   continue;
+			   }
+			   model.addElement(sorted.get(i));
+		   }
+		   if (isAdmin) {
+			   for (int i = 0; i < archived.size(); i++) {
+				   model.addElement(archived.get(i));
+			   }
+		   }
+		   
+	   }
+	   public void refreshSortedS() throws SQLException{
+		   model.removeAllElements();
+		   Database db = Database.getInstance();
+		   ArrayList<Pokemon> archived = new ArrayList<>();
+		   ArrayList<Pokemon> sorted = new ArrayList<>();
+		   sorted = db.sortedBySize();
+		   for (int i = 0; i < sorted.size(); i++) {
+			   if (sorted.get(i).isVisible() == false) {
+				   archived.add(sorted.get(i));
+				   continue;
+			   }
+			   model.addElement(sorted.get(i));
+		   }
+		   if (isAdmin) {
+			   for (int i = 0; i < archived.size(); i++) {
+				   model.addElement(archived.get(i));
+			   }
+		   }		   
+	   }
+	   public void refreshSortedW() throws SQLException{
+		   model.removeAllElements();
+		   Database db = Database.getInstance();
+		   ArrayList<Pokemon> archived = new ArrayList<>();
+		   ArrayList<Pokemon> sorted = new ArrayList<>();
+		   sorted = db.sortedByWeight();
+		   for (int i = 0; i < sorted.size(); i++) {
+			   if (sorted.get(i).isVisible() == false) {
+				   archived.add(sorted.get(i));
+				   continue;
+			   }
+			   model.addElement(sorted.get(i));
+		   }
+		   if (isAdmin) {
+			   for (int i = 0; i < archived.size(); i++) {
+				   model.addElement(archived.get(i));
+			   }
+		   }		
+	   }
+	   public void refreshSortedG() throws SQLException{
+		   model.removeAllElements();
+		   Database db = Database.getInstance();
+		   ArrayList<Pokemon> archived = new ArrayList<>();
+		   ArrayList<Pokemon> sorted = new ArrayList<>();
+		   sorted = db.sortedByGeneration();
+		   for (int i = 0; i < sorted.size(); i++) {
+			   if (sorted.get(i).isVisible() == false) {
+				   archived.add(sorted.get(i));
+				   continue;
+			   }
+			   model.addElement(sorted.get(i));
+		   }
+		   if (isAdmin) {
+			   for (int i = 0; i < archived.size(); i++) {
+				   model.addElement(archived.get(i));
+			   }
+		   }		
+	   }
+	   public void refreshSortedT() throws SQLException{
+		   model.removeAllElements();
+		   Database db = Database.getInstance();
+		   ArrayList<Pokemon> archived = new ArrayList<>();
+		   ArrayList<Pokemon> sorted = new ArrayList<>();
+		   sorted = db.sortedByType();
+		   for (int i = 0; i < sorted.size(); i++) {
+			   if (sorted.get(i).isVisible() == false) {
+				   archived.add(sorted.get(i));
+				   continue;
+			   }
+			   model.addElement(sorted.get(i));
+		   }
+		   if (isAdmin) {
+			   for (int i = 0; i < archived.size(); i++) {
+				   model.addElement(archived.get(i));
+			   }
+		   }		
 	   }
 		
 		/**
@@ -401,6 +501,39 @@ public class MainWindow extends JFrame {
 			        } 
 			    }
 			});
+		   
+		   sortCb.addActionListener(new ActionListener() {
+			   @Override
+			   public void actionPerformed(ActionEvent e) {
+				   try {
+				   String s = (String) sortCb.getSelectedItem();
+				   switch(s) {
+				   case "Alphabetically":
+					   refreshSortedA();
+					   break;
+				   case "Type":
+					   refreshSortedT();
+					   break;
+				   case "Weight":
+					   refreshSortedW();
+					   break;
+				   case "Generation":
+					   refreshSortedG();
+					   break;
+				   case "Size":
+					   refreshSortedS();
+					   break;
+				   case "Select One":
+					   refreshArchived();
+					   break;
+				   }
+				   }
+				   catch(SQLException e1) {
+					   e1.printStackTrace();
+				   }				  				   
+			   }
+			   
+		   });
 		   
 		   gbc.gridx = 0;
 		   gbc.gridy = 0;

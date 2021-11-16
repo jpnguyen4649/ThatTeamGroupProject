@@ -282,6 +282,132 @@ public class Database {
 	   return list;
    }
    
+ //sort alphabetically
+
+   public ArrayList<Pokemon> sortedAlphabetically(){
+	   ArrayList<Pokemon> sorted = new ArrayList<>();
+	   try ( Statement stmt = conn.createStatement();
+			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Pokemon asc");
+			   ResultSet results = statement.executeQuery()
+			   ) {
+		   while (results.next() ) {
+			   int id = results.getInt("id");
+			   String name = results.getString("Pokemon");
+	           String type = results.getString("Type");
+	           int gen = results.getInt("Generation");
+	           float weight = results.getFloat("Weight");
+	           int size = results.getInt("Size");
+	           boolean visible = results.getBoolean("Visible");
+	           sorted.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		   }
+	   }
+	   catch (SQLException e) {
+		   e.printStackTrace();
+	   }
+	   return sorted;
+	   
+   }
+   
+   //sort by size
+   
+   public ArrayList<Pokemon> sortedBySize(){
+	   ArrayList<Pokemon> sorted = new ArrayList<>();
+	   try ( Statement stmt = conn.createStatement();
+			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Size asc");
+			   ResultSet results = statement.executeQuery()
+			   ) {
+		   while (results.next() ) {
+			   int id = results.getInt("id");
+			   String name = results.getString("Pokemon");
+	           String type = results.getString("Type");
+	           int gen = results.getInt("Generation");
+	           float weight = results.getFloat("Weight");
+	           int size = results.getInt("Size");
+	           boolean visible = results.getBoolean("Visible");
+	           sorted.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		   }
+	   }
+	   catch (SQLException e) {
+		   e.printStackTrace();
+	   }
+	   return sorted;
+	   
+   }
+	
+   //sort by weight
+   public ArrayList<Pokemon> sortedByWeight(){
+	   ArrayList<Pokemon> sorted = new ArrayList<>();
+	   try ( Statement stmt = conn.createStatement();
+			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Weight asc");
+			   ResultSet results = statement.executeQuery()
+			   ) {
+		   while (results.next() ) {
+			   int id = results.getInt("id");
+			   String name = results.getString("Pokemon");
+	           String type = results.getString("Type");
+	           int gen = results.getInt("Generation");
+	           float weight = results.getFloat("Weight");
+	           int size = results.getInt("Size");
+	           boolean visible = results.getBoolean("Visible");
+	           sorted.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		   }
+	   }
+	   catch (SQLException e) {
+		   e.printStackTrace();
+	   }
+	   return sorted;
+	   
+   }
+   // sort by generation
+   public ArrayList<Pokemon> sortedByGeneration(){
+	   ArrayList<Pokemon> sorted = new ArrayList<>();
+	   try ( Statement stmt = conn.createStatement();
+			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Generation asc");
+			   ResultSet results = statement.executeQuery()
+			   ) {
+		   while (results.next() ) {
+			   int id = results.getInt("id");
+			   String name = results.getString("Pokemon");
+	           String type = results.getString("Type");
+	           int gen = results.getInt("Generation");
+	           float weight = results.getFloat("Weight");
+	           int size = results.getInt("Size");
+	           boolean visible = results.getBoolean("Visible");
+	           sorted.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		   }
+	   }
+	   catch (SQLException e) {
+		   e.printStackTrace();
+	   }
+	   return sorted;
+	   
+   }
+   // sorted by type
+   public ArrayList<Pokemon> sortedByType(){
+	   ArrayList<Pokemon> sorted = new ArrayList<>();
+	   try ( Statement stmt = conn.createStatement();
+			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Type asc");
+			   ResultSet results = statement.executeQuery()
+			   ) {
+		   while (results.next() ) {
+			   int id = results.getInt("id");
+			   String name = results.getString("Pokemon");
+	           String type = results.getString("Type");
+	           int gen = results.getInt("Generation");
+	           float weight = results.getFloat("Weight");
+	           int size = results.getInt("Size");
+	           boolean visible = results.getBoolean("Visible");
+	           sorted.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		   }
+	   }
+	   catch (SQLException e) {
+		   e.printStackTrace();
+	   }
+	   return sorted;
+	   
+   }
+   
+   
    /**
     * Connects to the database.
     * @throws SQLException
