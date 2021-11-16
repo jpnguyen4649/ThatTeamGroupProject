@@ -191,7 +191,7 @@ public class MainWindow extends JFrame {
 		   
 		   // List Panel.
 		   JPanel listPanel = new JPanel();
-		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));
+		   listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
 		   
 		   scrollPane = new JScrollPane();
 		   scrollPane.setViewportView(list);

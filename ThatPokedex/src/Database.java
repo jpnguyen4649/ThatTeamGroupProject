@@ -158,6 +158,7 @@ public class Database {
        
    }
    
+   
    /**
     * This method returns a Pokemon ArrayList containing all Pokemon in the database.
     * @return an ArrayList containing all Pokemon in the database.
