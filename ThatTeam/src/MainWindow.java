@@ -22,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Vector;
 import java.awt.event.ActionEvent;
 import java.awt.GridBagConstraints;
 
@@ -45,7 +46,9 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.JPanel;
+
 
 /**
  * This class renders the items in the JList containing Pokemon objects.
@@ -71,8 +74,8 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
 			setForeground(Color.black);
 		}
 		if (isSelected) {
-			setBackground(HIGHLIGHT_COLOR);
-			setForeground(Color.white);
+			setBackground(list.getSelectionBackground());
+			setForeground(list.getSelectionForeground());
 		}
 		else {
 			setBackground(Color.white);
@@ -98,9 +101,12 @@ public class MainWindow extends JFrame {
 	// Filter GUI components.
 	JLabel filterLabel;
 	JLabel typeFilterLabel;
-	JComboBox<String> typeFilterCb;
+//	JComboBox<String> typeFilterCb;
+//	CheckedComboBox<CheckableItem> typeFilterCb;
+	CustomComboCheck typeFilterCb;
 	JLabel genFilterLabel;
-	JComboBox<Integer> genFilterCb;
+//	JComboBox<Integer> genFilterCb;
+	CustomComboCheck genFilterCb;
 	JLabel sizeFilterLabel;
 	JComboBox<Double> sizeFilterCb;
 	//JSlider sizeFilterSlider;
@@ -148,16 +154,20 @@ public class MainWindow extends JFrame {
 	
 	   /**
 	    * This method refreshes the Pokemon list display so that archived Pokemon appear at the bottom.
+	 * @throws SQLException 
 	    */
-	   public void refreshArchived() {
+	   public void refreshArchived() throws SQLException {
 		   model.removeAllElements();
+		   Database db = Database.getInstance();
 		   ArrayList<Pokemon> archived = new ArrayList<>();
-		   for (int i = 0; i < pokemonList.size(); i++) {
-			   if (pokemonList.get(i).isVisible() == false) {
-				   archived.add(pokemonList.get(i));
+		   ArrayList<Pokemon> filtered = new ArrayList<>();
+		   filtered = db.getDisplayedPokemon();
+		   for (int i = 0; i < filtered.size(); i++) {
+			   if (filtered.get(i).isVisible() == false) {
+				   archived.add(filtered.get(i));
 				   continue;
 			   }
-			   model.addElement(pokemonList.get(i));
+			   model.addElement(filtered.get(i));
 		   }
 		   if (isAdmin) {
 			   for (int i = 0; i < archived.size(); i++) {
@@ -173,7 +183,12 @@ public class MainWindow extends JFrame {
 		   Database db = Database.getInstance();
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   ArrayList<Pokemon> sorted = new ArrayList<>();		   
-		   sorted = db.sortedAlphabetically();		   
+		   sorted = db.sortedAlphabetically();
+		   
+		   for(int i = 0; i < sorted.size(); i++) {
+			   System.out.println(sorted.get(i).getName() + "\t" + sorted.get(i).getGeneration() + "\t" + sorted.get(i).getTypes());
+		   }
+		   
 		   for (int i = 0; i < sorted.size(); i++) {
 			   if (sorted.get(i).isVisible() == false) {
 				   archived.add(sorted.get(i));
@@ -194,6 +209,12 @@ public class MainWindow extends JFrame {
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   ArrayList<Pokemon> sorted = new ArrayList<>();
 		   sorted = db.sortedBySize();
+		   
+		   for(int i = 0; i < sorted.size(); i++) {
+			   System.out.println(sorted.get(i).getName() + "\t" + sorted.get(i).getGeneration() + "\t" + sorted.get(i).getTypes());
+		   }
+		   
+		   
 		   for (int i = 0; i < sorted.size(); i++) {
 			   if (sorted.get(i).isVisible() == false) {
 				   archived.add(sorted.get(i));
@@ -213,6 +234,12 @@ public class MainWindow extends JFrame {
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   ArrayList<Pokemon> sorted = new ArrayList<>();
 		   sorted = db.sortedByWeight();
+		   
+		   for(int i = 0; i < sorted.size(); i++) {
+			   System.out.println(sorted.get(i).getName() + "\t" + sorted.get(i).getGeneration() + "\t" + sorted.get(i).getTypes());
+		   }
+		   
+		   
 		   for (int i = 0; i < sorted.size(); i++) {
 			   if (sorted.get(i).isVisible() == false) {
 				   archived.add(sorted.get(i));
@@ -232,6 +259,12 @@ public class MainWindow extends JFrame {
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   ArrayList<Pokemon> sorted = new ArrayList<>();
 		   sorted = db.sortedByGeneration();
+
+		   for(int i = 0; i < sorted.size(); i++) {
+			   System.out.println(sorted.get(i).getName() + "\t" + sorted.get(i).getGeneration() + "\t" + sorted.get(i).getTypes());
+		   }
+		   
+		   
 		   for (int i = 0; i < sorted.size(); i++) {
 			   if (sorted.get(i).isVisible() == false) {
 				   archived.add(sorted.get(i));
@@ -251,6 +284,12 @@ public class MainWindow extends JFrame {
 		   ArrayList<Pokemon> archived = new ArrayList<>();
 		   ArrayList<Pokemon> sorted = new ArrayList<>();
 		   sorted = db.sortedByType();
+		   
+		   for(int i = 0; i < sorted.size(); i++) {
+			   System.out.println(sorted.get(i).getName() + "\t" + sorted.get(i).getGeneration() + "\t" + sorted.get(i).getTypes());
+		   }
+		   
+		   
 		   for (int i = 0; i < sorted.size(); i++) {
 			   if (sorted.get(i).isVisible() == false) {
 				   archived.add(sorted.get(i));
@@ -328,12 +367,25 @@ public class MainWindow extends JFrame {
 		   sizeFilterLabel = new JLabel("Size");
 		   weightFilterLabel = new JLabel("Weight");
 		   
-		   typeFilterCb = new JComboBox<String>();
-		   genFilterCb = new JComboBox<Integer>();
+
+		   String[] types = {"Electric", "Water", "Ice", "Flying", "Normal"};
+		   Vector typesVector = new Vector<>();
+		   for (int i = 0; i < types.length; i++) {
+			   typesVector.add(new JCheckBox(types[i], false));
+		   }
+		   typeFilterCb = new CustomComboCheck(typesVector);
+		   
+		   // TODO: modify this so it isn't hard coded		   
+		   String[] gens = {"1", "2", "3", "4", "5", "6"};
+		   Vector gensVector = new Vector<>();
+		   for (int i = 0; i < gens.length; i++) {
+			   gensVector.add(new JCheckBox(gens[i], false));
+		   }
+		   genFilterCb = new CustomComboCheck(gensVector);
+		   
+		   
 		   sizeFilterCb = new JComboBox<Double>();
-		   //sizeFilterSlider = new JSlider();
 		   weightFilterCb = new JComboBox<Double>();
-		   //weightFilterSlider = new JSlider();
 		   applyFilterBtn = new JButton("Apply");
 		   filterPanel.add(filterLabel);
 		   filterPanel.add(typeFilterLabel);
@@ -341,25 +393,67 @@ public class MainWindow extends JFrame {
 		   filterPanel.add(genFilterLabel);
 		   filterPanel.add(genFilterCb);
 		   filterPanel.add(sizeFilterLabel);
-		   //filterPanel.add(sizeFilterSlider);
 		   filterPanel.add(sizeFilterCb);
 		   filterPanel.add(weightFilterLabel);
 		   filterPanel.add(weightFilterCb);
-		   //filterPanel.add(weightFilterSlider);
 		   filterPanel.add(applyFilterBtn);
 		   
 		   
-		   typeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "Bug", "Bug, Fairy", "Bug, Flying", "Bug, Poison", "Dark", "Dragon", "Dragon, Psychic", "Electric", "Electric, Poison", "Fairy", "Fighting", "Fire", "Ghost ", "Ghost, Grass", "Grass", "Grass, Dragon", "Grass, Flying", "Grass, Poison", "Ground", "Ground, Psychic", "Ice", "Ice, Water", "Normal", "Normal, Fairy", "Normal, Flying", "Poison", "Poison, Flying", "Poison, Water", "Psychic", "Psychic, Fairy", "Psychic, Fire", "Psychic, Flying", "Psychic, Grass", "Rock", "Rock, Bug", "Rock, Fairy", "Rock, Grass", "Rock, Ground", "Rock, Ice", "Water", "Water, Electric", "Water, Fairy", "Water, Ground", "Water, Psychic"}));
-		   genFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "Generation 1", "Generation 2", "Generation 3", "Generation 4", "Generation 5", "Generation 6", "Generation 7", "Generation 8"}));
 		   sizeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "~ 0 ft.", "~ 1 ft.", "~ 2 ft.", "~ 3 ft.", "> 3 ft."}));
 		   weightFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "40 - 50 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
 		   
-		   ArrayList <Filter> filters = new ArrayList<>();
+//		   ArrayList <Filter> filters = new ArrayList<>();
+//		   applyFilterBtn.addActionListener(new ActionListener() {
+//			   public void actionPerformed(ActionEvent e) {
+//				   // Get selected filters
+//				   // Selected types.
+//				   
+//				   ArrayList<String> selectedTypes = typeFilterCb.getSelected();
+//				   for (int i = 0; i < selectedTypes.size(); i++) {
+//					   System.out.println(selectedTypes.get(i));
+//					   filters.add(new TypeFilter(selectedTypes.get(i)));
+//				   }
+//				   
+//				   ArrayList<Pokemon> filteredPokemon = db.filterOR(filters);		
+//				   for(int i = 0; i < filteredPokemon.size(); i++) {
+//					   System.out.println(filteredPokemon.get(i).getName() + "\t" + filteredPokemon.get(i).getSize() + "\t" + filteredPokemon.get(i).getTypes());
+//				   }
+//			   }
+//		   });
+		   
+		   
 		   applyFilterBtn.addActionListener(new ActionListener() {
 			   public void actionPerformed(ActionEvent e) {
-				   db.filterPokemon(filters);			     
+				   // Get selected filters
+				   // Selected types.
+				   
+				   ArrayList<TypeFilter> typeFilters = new ArrayList<>();
+				   ArrayList<String> selectedTypes = typeFilterCb.getSelected();
+				   for (int i = 0; i < selectedTypes.size(); i++) {
+					   typeFilters.add(new TypeFilter(selectedTypes.get(i)));
+				   }
+				   
+				   ArrayList<GenerationFilter> genFilters = new ArrayList<>();
+				   ArrayList<String> selectedGens = genFilterCb.getSelected();
+				   for (int i = 0; i < selectedGens.size(); i++) {
+					   genFilters.add(new GenerationFilter(Integer.valueOf(selectedGens.get(i))));
+				   }
+				   
+				   ArrayList<Pokemon> filteredPokemon = db.filterPokemon(typeFilters, genFilters, null, null);		
+				   for(int i = 0; i < filteredPokemon.size(); i++) {
+					   System.out.println(filteredPokemon.get(i).getName() + "\t" + filteredPokemon.get(i).getGeneration() + "\t" + filteredPokemon.get(i).getTypes());
+				   }
+				   
+				   try {
+					refreshArchived();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			   }
 		   });
+		   
+		   
 		   
 		   // Search Panel.
 		   JPanel searchPanel = new JPanel();
@@ -368,7 +462,6 @@ public class MainWindow extends JFrame {
 		   searchLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		   JPanel searchBarPanel = new JPanel();
 		   searchBarPanel.setLayout(new FlowLayout(2, 1, 0));
-//		   nameLabel = new JLabel("Name: ");
 		   searchField = new JTextField("Name: ", 8);
 		   
 		   searchBtn = new JButton("Search");
@@ -399,7 +492,6 @@ public class MainWindow extends JFrame {
 				} 
 			});
 		   
-//		   searchBarPanel.add(nameLabel);
 		   searchBarPanel.add(searchField);
 		   searchBarPanel.add(searchBtn); 
 		   
@@ -448,7 +540,12 @@ public class MainWindow extends JFrame {
 				   else {
 					   if (db.archivePokemon(selected)) {
 						   JOptionPane.showMessageDialog(MainWindow.this, "Successfully archived Pokemon.");
-						   refreshArchived();
+						   try {
+							refreshArchived();
+						} catch (SQLException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
 					   }
 					   else {
 						   JOptionPane.showMessageDialog(MainWindow.this, "Error in archving Pokemon. Please try again.");

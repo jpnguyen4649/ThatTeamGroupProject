@@ -19,6 +19,7 @@ public class Database {
    static final String USER = "b8b971738b2c3f"; 
    static final String PASS = "4908cd46";
    private Connection conn;
+   private QueryBuilder qb; // select query that finds current pokemon in list.
    
    private static Database single_instance = null;
 
@@ -55,101 +56,6 @@ public class Database {
           catch (SQLException e){
         	  e.printStackTrace();
           }
-   }
-   
-   
-   public void filterPokemon(ArrayList<Filter> filters) {
-	   try(
-			   Statement stmt = conn.createStatement();
-	      ) {
-		   	 //get all the selected filters
-		     //create a filter for each selected filter
-			 
-			 //Generation filters
-			 GenerationFilter gf = new GenerationFilter(1, "=");
-			 GenerationFilter gf2 = new GenerationFilter(2, "=");
-			 GenerationFilter gf3 = new GenerationFilter(3, "=");
-			 GenerationFilter gf4 = new GenerationFilter(4, "=");
-			 GenerationFilter gf5 = new GenerationFilter(5, "=");
-			 GenerationFilter gf6 = new GenerationFilter(6, "=");
-			 GenerationFilter gf7 = new GenerationFilter(7, "=");
-			 GenerationFilter gf8 = new GenerationFilter(8, "=");
-			 
-			 //Size filters 
-			 SizeFilter sf = new SizeFilter(1, ">"); // ~ 0
-			 SizeFilter sf1 = new SizeFilter(2, ">"); // ~ 1
-			 SizeFilter sf2 = new SizeFilter(3, ">"); // ~ 2
-			 SizeFilter sf3 = new SizeFilter(4, ">"); // ~ 3
-			 SizeFilter sf4 = new SizeFilter(4, "<"); // 3 < 
-			 
-			 //Weight filters
-			 WeightFilter wf = new WeightFilter(80.0f, "<"); // 80+
-			 WeightFilter wf2 = new WeightFilter(80.0f, ">"); // 70+
-			 WeightFilter wf3 = new WeightFilter(70.0f, ">"); // 60+
-			 WeightFilter wf4 = new WeightFilter(60.0f, ">"); // 50+
-			 WeightFilter wf5 = new WeightFilter(50.0f, ">"); // 40+
-			 WeightFilter wf6 = new WeightFilter(40.0f, ">"); // 30+
-			 WeightFilter wf7 = new WeightFilter(30.0f, ">"); // 20+
-			 WeightFilter wf8 = new WeightFilter(20.0f, ">"); // 10+
-			 WeightFilter wf9 = new WeightFilter(10.0f, ">"); // 0+
-			 
-			 //Type filters 
-			 TypeFilter tf = new TypeFilter("Electric", "LIKE");
-			 TypeFilter tf2 = new TypeFilter("Water", "LIKE");
-			 TypeFilter tf3 = new TypeFilter("Fire", "LIKE");
-			 TypeFilter tf4 = new TypeFilter("Ground", "LIKE");
-			 TypeFilter tf5 = new TypeFilter("Psychic", "LIKE");
-			 TypeFilter tf6 = new TypeFilter("Fairy", "LIKE");
-			 TypeFilter tf7 = new TypeFilter("Bug", "LIKE");
-			 TypeFilter tf8 = new TypeFilter("Flying", "LIKE");
-			 TypeFilter tf9 = new TypeFilter("Poison", "LIKE");
-			 TypeFilter tf10 = new TypeFilter("Dark", "LIKE");
-			 TypeFilter tf11 = new TypeFilter("Dragon", "LIKE");
-			 TypeFilter tf12 = new TypeFilter("Fighting", "LIKE");
-			 TypeFilter tf13 = new TypeFilter("Ghost", "LIKE");
-			 TypeFilter tf14 = new TypeFilter("Grass", "LIKE");
-			 TypeFilter tf15 = new TypeFilter("Ice", "LIKE");
-			 TypeFilter tf16 = new TypeFilter("Normal", "LIKE");
-			 TypeFilter tf17 = new TypeFilter("Rock", "LIKE");
-			 
-			 String statement = "SELECT * FROM pokemon_database WHERE ";
-			 
-			 ArrayList<TypeFilter> selected_types = new ArrayList<>(Arrays.asList(tf, tf2, tf3, tf4, tf5, tf6, tf7, tf8, tf9, tf10, tf11, tf12, tf13, tf14, tf15, tf16, tf17));
-		
-		     for (int i = 0; i < selected_types.size(); i++) {
-		        filters.add(new TypeFilter(statement, selected_types.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put
-		     }
-			 
-		     ArrayList<GenerationFilter> selected_generations = new ArrayList<>(Arrays.asList(gf, gf2, gf3, gf4, gf5, gf6, gf7, gf8));
-				
-		     for (int i = 0; i < selected_generations.size(); i++) {
-		        filters.add(new TypeFilter(statement, selected_generations.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put 
-		     }
-		     
-		     ArrayList<SizeFilter> selected_sizes = new ArrayList<>(Arrays.asList(sf, sf1, sf2, sf3, sf4));
-				
-		     for (int i = 0; i < selected_sizes.size(); i++) {
-		        filters.add(new TypeFilter(statement, selected_sizes.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put 
-		     }
-		     
-		     ArrayList<WeightFilter> selected_weights = new ArrayList<>(Arrays.asList(wf, wf2, wf3, wf4, wf5, wf6, wf7, wf8, wf9));
-				
-		     for (int i = 0; i < selected_weights.size(); i++) {
-		        filters.add(new TypeFilter(statement, selected_weights.get(i).getQueryComponent())); //Statement is wrong, just didn't know what to put 
-		     }
-			 
-			 for (int i = 0; i < filters.size(); i++) {
-		        statement = statement + " AND " + filters.get(i).getQueryComponent();
-		     }
-			 
-		     PreparedStatement pstmt = conn.prepareStatement(statement);
-		     
-		     for (int i = 0; i < filters.size(); i++) {
-		        filters.get(i).setInPreparedStatement(pstmt, i+1);
-		     }
-	   } catch (SQLException e){
-     	  e.printStackTrace();
-       }
    }
    
    
@@ -234,7 +140,7 @@ public class Database {
    /**
     * This method republishes an archived Pokemon.
     * @param pokemon the Pokemon to be republished.
-    * @return if the Pokemon was successfully republished;
+    * @return if the Pokemon was successfully republished.
     */
    public boolean republishPokemon(Pokemon pokemon) {
       try(
@@ -253,6 +159,104 @@ public class Database {
         	  return false;
           }
        
+   }
+   
+   public ArrayList<Pokemon>  filterOR(ArrayList<Filter> filters) {
+	   ArrayList<Pokemon> list = new ArrayList<>();
+	   try(
+			   Statement stmt = conn.createStatement();
+	      ) {
+		    String statement = "SELECT * FROM pokemon_database WHERE ";
+		    
+	        for (int i = 0; i < filters.size() - 1; i++) {
+	            statement = statement + filters.get(i).getQueryComponent() + " OR ";
+	        }
+	        // CHANGE THIS.
+	        statement = statement + filters.get(filters.size() - 1).getQueryComponent();
+	        PreparedStatement pstmt = conn.prepareStatement(statement);
+	        filters.get(0).setInPreparedStatement(pstmt, 1);
+	        for (int i = 1; i < filters.size(); i++) {
+	            filters.get(i).setInPreparedStatement(pstmt, i+1);
+	        }
+	        System.out.println(pstmt);
+	        ResultSet results = pstmt.executeQuery();
+	        while (results.next() ) {
+				   int id = results.getInt("id");
+				   String name = results.getString("Pokemon");
+		           String type = results.getString("Type");
+		           int gen = results.getInt("Generation");
+		           float weight = results.getFloat("Weight");
+		           int size = results.getInt("Size");
+		           boolean visible = results.getBoolean("Visible");
+		           list.add(new Pokemon(id, name, type, gen, weight, size, visible));
+			   }
+	   } catch (SQLException e){
+     	  e.printStackTrace();
+       }
+	   return list;
+   }
+   
+   public ArrayList<Pokemon>  filterPokemon(ArrayList<TypeFilter> typeFilters, ArrayList<GenerationFilter> genFilters, ArrayList<SizeFilter> sizeFilters, ArrayList<WeightFilter> weightFilters) {
+	   ArrayList<Pokemon> list = new ArrayList<>();
+	   try(
+			   Statement stmt = conn.createStatement();
+	      ) {
+		   
+		   
+		    if (typeFilters.size() > 0) qb.setTypeFilters(typeFilters);
+		    if (genFilters.size() > 0) qb.setGenFilters(genFilters);
+//		    if (sizeFilters.size() > 0) qb.setSizeFilters(sizeFilters);
+//		    if (weightFilters.size() > 0) qb.setWeightFilters(weightFilters);
+		    Query query = qb.getQuery();
+		    
+		    
+		    System.out.println("typeFilters: " + typeFilters);
+		    System.out.println("typeFilters: " + genFilters);
+		    System.out.println("typeFilters: " + sizeFilters);
+		    System.out.println("typeFilters: " + weightFilters);
+		    
+		    ResultSet results = query.executeQuery(conn);
+		    while(results.next()) {
+				   int id = results.getInt("id");
+				   String name = results.getString("Pokemon");
+		           String type = results.getString("Type");
+		           int gen = results.getInt("Generation");
+		           float weight = results.getFloat("Weight");
+		           int size = results.getInt("Size");
+		           boolean visible = results.getBoolean("Visible");
+		           list.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		    }
+		    
+
+	   } catch (SQLException e){
+     	  e.printStackTrace();
+       }
+	   return list;
+   }
+   
+   public ArrayList<Pokemon> getDisplayedPokemon() {
+	   ArrayList<Pokemon> list = new ArrayList<>();
+	   try(
+			   Statement stmt = conn.createStatement();
+	      ) {
+		    Query query = qb.getQuery();
+		    ResultSet results = query.executeQuery(conn);
+		    while(results.next()) {
+				   int id = results.getInt("id");
+				   String name = results.getString("Pokemon");
+		           String type = results.getString("Type");
+		           int gen = results.getInt("Generation");
+		           float weight = results.getFloat("Weight");
+		           int size = results.getInt("Size");
+		           boolean visible = results.getBoolean("Visible");
+		           list.add(new Pokemon(id, name, type, gen, weight, size, visible));
+		    }
+		    
+
+	   } catch (SQLException e){
+     	  e.printStackTrace();
+       }
+	   return list;		    
    }
    
    /**
@@ -287,8 +291,9 @@ public class Database {
    public ArrayList<Pokemon> sortedAlphabetically(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Pokemon asc");
-			   ResultSet results = statement.executeQuery()
+//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Pokemon asc");
+//			   ResultSet results = statement.executeQuery()
+			   ResultSet results = qb.setSort("Pokemon").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
 			   int id = results.getInt("id");
@@ -313,8 +318,9 @@ public class Database {
    public ArrayList<Pokemon> sortedBySize(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Size asc");
-			   ResultSet results = statement.executeQuery()
+//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Size asc");
+//			   ResultSet results = statement.executeQuery()
+			   ResultSet results = qb.setSort("Size").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
 			   int id = results.getInt("id");
@@ -338,8 +344,9 @@ public class Database {
    public ArrayList<Pokemon> sortedByWeight(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Weight asc");
-			   ResultSet results = statement.executeQuery()
+//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Weight asc");
+//			   ResultSet results = statement.executeQuery()
+			   ResultSet results = qb.setSort("Weight").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
 			   int id = results.getInt("id");
@@ -362,8 +369,9 @@ public class Database {
    public ArrayList<Pokemon> sortedByGeneration(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Generation asc");
-			   ResultSet results = statement.executeQuery()
+//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Generation asc");
+//			   ResultSet results = statement.executeQuery()
+			   ResultSet results = qb.setSort("Generation").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
 			   int id = results.getInt("id");
@@ -386,8 +394,9 @@ public class Database {
    public ArrayList<Pokemon> sortedByType(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Type asc");
-			   ResultSet results = statement.executeQuery()
+//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Type asc");
+//			   ResultSet results = statement.executeQuery()
+			   ResultSet results = qb.setSort("Type").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
 			   int id = results.getInt("id");
@@ -426,6 +435,7 @@ public class Database {
    
    private Database() throws SQLException {
 	   connectDatabase();
+	   qb = new QueryBuilder();
    }
    
    /**

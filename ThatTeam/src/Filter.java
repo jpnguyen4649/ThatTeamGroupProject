@@ -1,24 +1,24 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 
 
 abstract class Filter<T extends Object> {
     protected T value = null;
-    protected String condition;
+    protected String condition = "=";
     
     protected Filter(T value, String condition) {
         this.value = value;
         this.condition = condition;
     }
     
+    protected Filter(T value) {
+    	this.value = value;
+    }
+    
     abstract String getName();
     
     String getQueryComponent() {
-        return this.getName() + " "  + condition + " " + value.toString();
+    	return this.getName() + " " + condition + " ? ";
     }
     
     void setInPreparedStatement(PreparedStatement pstmt, int index) throws SQLException {
@@ -42,8 +42,8 @@ class WeightFilter extends Filter<Float> {
 
 class GenerationFilter extends Filter<Integer> {
 
-    protected GenerationFilter(Integer value, String condition) {
-        super(value, condition);
+    protected GenerationFilter(Integer value) {
+        super(value);
     }
 
     @Override
@@ -68,19 +68,14 @@ class SizeFilter extends Filter<Integer> {
 
 class TypeFilter extends Filter<String> {
 
-    protected TypeFilter(String value, String condition) {
-        super(value, condition);
+    protected TypeFilter(String value) {
+        super("%" + value + "%");
+        this.condition = "LIKE";
     }
     
     @Override 
     String getName() {
         return "Type";
-    }
-    
-    @Override 
-    String getQueryComponent() {
-        // add the logic to modify query component for list of types
-        return this.getName() + " "  + condition + " " + "%{"+ value + "}%";
     }
     
 }
