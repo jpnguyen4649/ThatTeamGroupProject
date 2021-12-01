@@ -27,10 +27,10 @@ abstract class Filter<T extends Object> {
 
 }
 
-class WeightFilter extends Filter<Float> {
+class WeightFilter extends Filter<Double> {
 
-    protected WeightFilter(Float value, String condition) {
-        super(value, condition);
+    protected WeightFilter(double leftWeight, String condition) {
+        super(leftWeight, condition);
     }
 
     @Override

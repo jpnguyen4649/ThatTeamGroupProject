@@ -56,11 +56,6 @@ public class Query {
 		String sizeString = null;
 		String weightString = null;
 		
-	    System.out.println("tfs: " + tfs);
-	    System.out.println("gfs: " + gfs);
-	    System.out.println("sfs: " + sfs);
-	    System.out.println("wfs: " + wfs);
-		
 		if (tfs != null) {
 			ArrayList<String> typeQC = new ArrayList<>();
 			for (int i = 0; i < tfs.size(); i++) {
@@ -111,7 +106,7 @@ public class Query {
 			filter = " WHERE " + and(fullQC);
 		}
 		// Not sort order specified.
-		if (sortField == null) {
+		if (sortField == null || sortBy == "None") {
 			sortBy = "";
 		}
 		else {

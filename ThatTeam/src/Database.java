@@ -161,41 +161,6 @@ public class Database {
        
    }
    
-   public ArrayList<Pokemon>  filterOR(ArrayList<Filter> filters) {
-	   ArrayList<Pokemon> list = new ArrayList<>();
-	   try(
-			   Statement stmt = conn.createStatement();
-	      ) {
-		    String statement = "SELECT * FROM pokemon_database WHERE ";
-		    
-	        for (int i = 0; i < filters.size() - 1; i++) {
-	            statement = statement + filters.get(i).getQueryComponent() + " OR ";
-	        }
-	        // CHANGE THIS.
-	        statement = statement + filters.get(filters.size() - 1).getQueryComponent();
-	        PreparedStatement pstmt = conn.prepareStatement(statement);
-	        filters.get(0).setInPreparedStatement(pstmt, 1);
-	        for (int i = 1; i < filters.size(); i++) {
-	            filters.get(i).setInPreparedStatement(pstmt, i+1);
-	        }
-	        System.out.println(pstmt);
-	        ResultSet results = pstmt.executeQuery();
-	        while (results.next() ) {
-				   int id = results.getInt("id");
-				   String name = results.getString("Pokemon");
-		           String type = results.getString("Type");
-		           int gen = results.getInt("Generation");
-		           float weight = results.getFloat("Weight");
-		           int size = results.getInt("Size");
-		           boolean visible = results.getBoolean("Visible");
-		           list.add(new Pokemon(id, name, type, gen, weight, size, visible));
-			   }
-	   } catch (SQLException e){
-     	  e.printStackTrace();
-       }
-	   return list;
-   }
-   
    public ArrayList<Pokemon>  filterPokemon(ArrayList<TypeFilter> typeFilters, ArrayList<GenerationFilter> genFilters, ArrayList<SizeFilter> sizeFilters, ArrayList<WeightFilter> weightFilters) {
 	   ArrayList<Pokemon> list = new ArrayList<>();
 	   try(
@@ -205,15 +170,15 @@ public class Database {
 		   
 		    if (typeFilters.size() > 0) qb.setTypeFilters(typeFilters);
 		    if (genFilters.size() > 0) qb.setGenFilters(genFilters);
-//		    if (sizeFilters.size() > 0) qb.setSizeFilters(sizeFilters);
-//		    if (weightFilters.size() > 0) qb.setWeightFilters(weightFilters);
+		    if (sizeFilters.size() > 0) qb.setSizeFilters(sizeFilters);
+		    if (weightFilters.size() > 0) qb.setWeightFilters(weightFilters);
 		    Query query = qb.getQuery();
 		    
 		    
-		    System.out.println("typeFilters: " + typeFilters);
-		    System.out.println("typeFilters: " + genFilters);
-		    System.out.println("typeFilters: " + sizeFilters);
-		    System.out.println("typeFilters: " + weightFilters);
+//		    System.out.println("typeFilters: " + typeFilters);
+//		    System.out.println("typeFilters: " + genFilters);
+//		    System.out.println("typeFilters: " + sizeFilters);
+//		    System.out.println("typeFilters: " + weightFilters);
 		    
 		    ResultSet results = query.executeQuery(conn);
 		    while(results.next()) {
@@ -251,7 +216,6 @@ public class Database {
 		           boolean visible = results.getBoolean("Visible");
 		           list.add(new Pokemon(id, name, type, gen, weight, size, visible));
 		    }
-		    
 
 	   } catch (SQLException e){
      	  e.printStackTrace();
@@ -291,8 +255,6 @@ public class Database {
    public ArrayList<Pokemon> sortedAlphabetically(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Pokemon asc");
-//			   ResultSet results = statement.executeQuery()
 			   ResultSet results = qb.setSort("Pokemon").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
@@ -318,8 +280,6 @@ public class Database {
    public ArrayList<Pokemon> sortedBySize(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Size asc");
-//			   ResultSet results = statement.executeQuery()
 			   ResultSet results = qb.setSort("Size").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
@@ -344,8 +304,6 @@ public class Database {
    public ArrayList<Pokemon> sortedByWeight(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Weight asc");
-//			   ResultSet results = statement.executeQuery()
 			   ResultSet results = qb.setSort("Weight").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
@@ -369,8 +327,6 @@ public class Database {
    public ArrayList<Pokemon> sortedByGeneration(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Generation asc");
-//			   ResultSet results = statement.executeQuery()
 			   ResultSet results = qb.setSort("Generation").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {
@@ -394,8 +350,6 @@ public class Database {
    public ArrayList<Pokemon> sortedByType(){
 	   ArrayList<Pokemon> sorted = new ArrayList<>();
 	   try ( Statement stmt = conn.createStatement();
-//			   PreparedStatement statement = conn.prepareStatement("SELECT * FROM pokemon_database order by Type asc");
-//			   ResultSet results = statement.executeQuery()
 			   ResultSet results = qb.setSort("Type").getQuery().executeQuery(conn);
 			   ) {
 		   while (results.next() ) {

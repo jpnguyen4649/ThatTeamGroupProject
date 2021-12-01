@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -45,8 +46,6 @@ public class View extends JFrame {
 	JTextField weightField;
 	JTextField sizeField;
 	
-	
-	
 	JButton editBtn;
 	JButton republishBtn;
 	
@@ -65,9 +64,9 @@ public class View extends JFrame {
 		
 		setSize(300,300);
 		
-//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	    Container mainContainer = this.getContentPane();
-	    mainContainer.setLayout(new GridLayout(6, 1, 5, 2));
+//	    mainContainer.setLayout(new GridLayout(6, 1, 5, 2));
+	    mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.PAGE_AXIS));
 	    nameLabel = new JLabel("Name: ");
 	    typeLabel = new JLabel("Type: ");
 	    genLabel = new JLabel("Generation: ");

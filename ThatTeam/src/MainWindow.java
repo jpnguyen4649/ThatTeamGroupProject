@@ -18,6 +18,8 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -27,6 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.GridBagConstraints;
 
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
@@ -42,9 +45,13 @@ import javax.swing.JTextPane;
 import javax.swing.JCheckBox;
 import javax.swing.JToggleButton;
 import javax.swing.ListCellRenderer;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.text.NumberFormatter;
 import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
+import javax.swing.JSpinner;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JPanel;
@@ -56,7 +63,6 @@ import javax.swing.JPanel;
  *
  */
 class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
-	private static final Color HIGHLIGHT_COLOR = new Color(0, 0, 128);
 	
 	public PokemonCellRenderer() {
 		setOpaque(true);
@@ -69,10 +75,6 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
 		// TODO Auto-generated method stub
 		Pokemon pokemon = (Pokemon) value;
 		setText(pokemon.getName());
-		if (pokemon.isVisible() == false) {
-			setBackground(Color.red);
-			setForeground(Color.black);
-		}
 		if (isSelected) {
 			setBackground(list.getSelectionBackground());
 			setForeground(list.getSelectionForeground());
@@ -80,6 +82,15 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
 		else {
 			setBackground(Color.white);
 			setForeground(Color.black);
+		}
+		
+		if (pokemon.isVisible() == false) {
+			setBackground(Color.lightGray);
+			setForeground(Color.black);
+			if (isSelected) {
+				setBackground(list.getSelectionBackground());
+				setForeground(list.getSelectionForeground());
+			}
 		}
 		return this;
 	}
@@ -93,26 +104,41 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
  */
 public class MainWindow extends JFrame {
 	
-	boolean isAdmin;
+	static boolean isAdmin;
 	ArrayList<Pokemon> pokemonList;
-	DefaultListModel<Pokemon> model;
+	static DefaultListModel<Pokemon> model;
 	GridBagConstraints gbc = new GridBagConstraints();
 	
 	// Filter GUI components.
 	JLabel filterLabel;
+	
 	JLabel typeFilterLabel;
-//	JComboBox<String> typeFilterCb;
-//	CheckedComboBox<CheckableItem> typeFilterCb;
 	CustomComboCheck typeFilterCb;
+	
 	JLabel genFilterLabel;
-//	JComboBox<Integer> genFilterCb;
 	CustomComboCheck genFilterCb;
+	
 	JLabel sizeFilterLabel;
-	JComboBox<Double> sizeFilterCb;
-	//JSlider sizeFilterSlider;
+	JSpinner leftFeetField;
+	JLabel leftSizeFeetLabel;
+	JSpinner leftInchField;
+	JLabel leftSizeInchLabel;
+	
+	JLabel sizeDashLabel;
+	
+	JSpinner rightFeetField;
+	JLabel rightSizeFeetLabel;
+	JSpinner rightInchField;
+	JLabel rightSizeInchLabel;
+
+	
 	JLabel weightFilterLabel;
-	//JSlider weightFilterSlider;
-	JComboBox<Double> weightFilterCb;
+	JSpinner leftWeightField;
+	JLabel leftWeightUnitLabel;
+	JLabel weightDashLabel;
+	JSpinner rightWeightField;
+	JLabel rightWeightUnitLabel;
+	
 	JButton applyFilterBtn;
 	
 	// List GUI components.
@@ -156,7 +182,7 @@ public class MainWindow extends JFrame {
 	    * This method refreshes the Pokemon list display so that archived Pokemon appear at the bottom.
 	 * @throws SQLException 
 	    */
-	   public void refreshArchived() throws SQLException {
+	   public static void refreshArchived() throws SQLException {
 		   model.removeAllElements();
 		   Database db = Database.getInstance();
 		   ArrayList<Pokemon> archived = new ArrayList<>();
@@ -359,16 +385,30 @@ public class MainWindow extends JFrame {
 		   
 		   // Filter Panel.
 		   JPanel filterPanel = new JPanel();
-		   filterPanel.setLayout(new GridLayout(10, 1, 5, 5));
+//		   filterPanel.setLayout(new GridLayout(10, 1, 5, 5));
+		   filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.PAGE_AXIS));
+//		   filterPanel.setAlignmentX(Component._ALIGNMENT);
+		   
+		   JPanel filterLabelPanel = new JPanel();
+		   filterLabelPanel.setAlignmentX(LEFT_ALIGNMENT);
+		   
 		   filterLabel = new JLabel("Filter:");
+		   filterLabel.setAlignmentX(CENTER_ALIGNMENT);
 		   filterLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
+		   filterLabelPanel.add(filterLabel);
+		   
 		   typeFilterLabel = new JLabel("Type");
+		   typeFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+		   typeFilterLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		   genFilterLabel = new JLabel("Generation");
+		   genFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		   sizeFilterLabel = new JLabel("Size");
+		   sizeFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		   weightFilterLabel = new JLabel("Weight");
+		   weightFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		   
 
-		   String[] types = {"Electric", "Water", "Ice", "Flying", "Normal"};
+		   String[] types = {"Poison", "Ground", "Flying", "Water", "Rock", "Ghost", "Grass", "Fighting", "Dark", "Ice", "Fairy", "Normal", "Fire", "Dragon", "Bug", "Electric", "Psychic"};
 		   Vector typesVector = new Vector<>();
 		   for (int i = 0; i < types.length; i++) {
 			   typesVector.add(new JCheckBox(types[i], false));
@@ -377,6 +417,7 @@ public class MainWindow extends JFrame {
 		   
 		   // TODO: modify this so it isn't hard coded		   
 		   String[] gens = {"1", "2", "3", "4", "5", "6"};
+		   
 		   Vector gensVector = new Vector<>();
 		   for (int i = 0; i < gens.length; i++) {
 			   gensVector.add(new JCheckBox(gens[i], false));
@@ -384,49 +425,101 @@ public class MainWindow extends JFrame {
 		   genFilterCb = new CustomComboCheck(gensVector);
 		   
 		   
-		   sizeFilterCb = new JComboBox<Double>();
-		   weightFilterCb = new JComboBox<Double>();
+
+		   
+		   // Size Panel. 
+		   JPanel sizePanel = new JPanel();
+		   sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.LINE_AXIS)); 
+//		   sizePanel.setLayout(new GridLayout(1, 9));
+		   
+		   leftFeetField = new JSpinner();
+		   leftFeetField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+		   leftFeetField.setEditor(new JSpinner.NumberEditor(leftFeetField,"#"));
+		   leftSizeFeetLabel = new JLabel("ft.");
+		   
+		   leftInchField = new JSpinner();
+		   leftInchField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+		   leftInchField.setEditor(new JSpinner.NumberEditor(leftInchField,""));
+		   JFormattedTextField leftInchEditor = ((JSpinner.NumberEditor) leftInchField.getEditor()).getTextField();
+		   ((NumberFormatter) leftInchEditor.getFormatter()).setAllowsInvalid(false);
+		   leftSizeInchLabel = new JLabel("in.");
+		   
+		   sizeDashLabel = new JLabel("-");
+		   
+		   rightFeetField = new JSpinner();
+		   rightFeetField.setModel(new SpinnerNumberModel(1000, 0, 1000, 1));
+		   rightFeetField.setEditor(new JSpinner.NumberEditor(rightFeetField,""));
+		   rightFeetField.setEditor(new JSpinner.NumberEditor(rightFeetField,"#"));
+		   rightSizeFeetLabel = new JLabel("ft.");
+		   
+		   rightInchField = new JSpinner();
+		   rightInchField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+		   rightInchField.setEditor(new JSpinner.NumberEditor(rightInchField,""));
+		   JFormattedTextField rightInchEditor = ((JSpinner.NumberEditor) rightInchField.getEditor()).getTextField();
+		   ((NumberFormatter) rightInchEditor.getFormatter()).setAllowsInvalid(false);
+		   rightSizeInchLabel = new JLabel("in.");
+		   
+		   sizePanel.add(leftFeetField);
+		   sizePanel.add(leftSizeFeetLabel);
+//		   sizePanel.add(leftInchField);
+//		   sizePanel.add(leftSizeInchLabel);
+		   sizePanel.add(sizeDashLabel);
+		   sizePanel.add(rightFeetField);
+		   sizePanel.add(rightSizeFeetLabel);
+//		   sizePanel.add(rightInchField);
+//		   sizePanel.add(rightSizeInchLabel);
+		   
+		   // Weight Panel.
+		   JPanel weightPanel = new JPanel();
+		   weightPanel.setLayout(new BoxLayout(weightPanel, BoxLayout.LINE_AXIS));
+		   leftWeightField = new JSpinner();
+		   leftWeightField.setModel(new SpinnerNumberModel(0, 0, 10000, 0.1));
+		   leftWeightField.setEditor(new JSpinner.NumberEditor(leftWeightField,"##.#"));
+		   leftWeightUnitLabel = new JLabel("lbs.");
+		   weightDashLabel = new JLabel("-");
+		   rightWeightField = new JSpinner();
+		   rightWeightField.setModel(new SpinnerNumberModel(10000, 0, 10000, 0.1));
+		   rightWeightField.setEditor(new JSpinner.NumberEditor(rightWeightField,"##.#"));
+		   rightWeightUnitLabel = new JLabel("lbs.");
+		   
+		   weightPanel.add(leftWeightField);
+		   weightPanel.add(leftWeightUnitLabel);
+		   weightPanel.add(weightDashLabel);
+		   weightPanel.add(rightWeightField);
+		   weightPanel.add(rightWeightUnitLabel);
+		   
+
+		   typeFilterCb.setAlignmentX(LEFT_ALIGNMENT);
+		   genFilterCb.setAlignmentX(LEFT_ALIGNMENT);
+		   sizePanel.setAlignmentX(LEFT_ALIGNMENT);
+		   weightPanel.setAlignmentX(LEFT_ALIGNMENT);
+		   
+		   JPanel applyBtnPanel = new JPanel();
+		   applyBtnPanel.setAlignmentX(LEFT_ALIGNMENT);
 		   applyFilterBtn = new JButton("Apply");
-		   filterPanel.add(filterLabel);
+		   applyFilterBtn.setAlignmentX(CENTER_ALIGNMENT);
+		   applyBtnPanel.add(applyFilterBtn);
+		   
+//		   filterPanel.add(filterLabel);
+		   filterPanel.add(filterLabelPanel);
 		   filterPanel.add(typeFilterLabel);
 		   filterPanel.add(typeFilterCb);
 		   filterPanel.add(genFilterLabel);
 		   filterPanel.add(genFilterCb);
 		   filterPanel.add(sizeFilterLabel);
-		   filterPanel.add(sizeFilterCb);
+//		   filterPanel.add(sizeFilterCb);
+		   filterPanel.add(sizePanel);
 		   filterPanel.add(weightFilterLabel);
-		   filterPanel.add(weightFilterCb);
-		   filterPanel.add(applyFilterBtn);
+//		   filterPanel.add(weightFilterCb);
+		   filterPanel.add(weightPanel);
+//		   filterPanel.add(applyFilterBtn);
+		   filterPanel.add(applyBtnPanel);
 		   
-		   
-		   sizeFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "~ 0 ft.", "~ 1 ft.", "~ 2 ft.", "~ 3 ft.", "> 3 ft."}));
-		   weightFilterCb.setModel(new DefaultComboBoxModel(new String[] {"Select One", "0 - 10 lbs", "10 - 20 lbs", "20 - 30 lbs", "30 - 40 lbs", "40 - 50 lbs", "50 - 60 lbs", "60 - 70 lbs", "70 - 80 lbs", "80+ lbs"}));
-		   
-//		   ArrayList <Filter> filters = new ArrayList<>();
-//		   applyFilterBtn.addActionListener(new ActionListener() {
-//			   public void actionPerformed(ActionEvent e) {
-//				   // Get selected filters
-//				   // Selected types.
-//				   
-//				   ArrayList<String> selectedTypes = typeFilterCb.getSelected();
-//				   for (int i = 0; i < selectedTypes.size(); i++) {
-//					   System.out.println(selectedTypes.get(i));
-//					   filters.add(new TypeFilter(selectedTypes.get(i)));
-//				   }
-//				   
-//				   ArrayList<Pokemon> filteredPokemon = db.filterOR(filters);		
-//				   for(int i = 0; i < filteredPokemon.size(); i++) {
-//					   System.out.println(filteredPokemon.get(i).getName() + "\t" + filteredPokemon.get(i).getSize() + "\t" + filteredPokemon.get(i).getTypes());
-//				   }
-//			   }
-//		   });
 		   
 		   
 		   applyFilterBtn.addActionListener(new ActionListener() {
 			   public void actionPerformed(ActionEvent e) {
-				   // Get selected filters
-				   // Selected types.
-				   
+
 				   ArrayList<TypeFilter> typeFilters = new ArrayList<>();
 				   ArrayList<String> selectedTypes = typeFilterCb.getSelected();
 				   for (int i = 0; i < selectedTypes.size(); i++) {
@@ -439,9 +532,22 @@ public class MainWindow extends JFrame {
 					   genFilters.add(new GenerationFilter(Integer.valueOf(selectedGens.get(i))));
 				   }
 				   
-				   ArrayList<Pokemon> filteredPokemon = db.filterPokemon(typeFilters, genFilters, null, null);		
+				   ArrayList<SizeFilter> sizeFilters = new ArrayList<> ();
+				   int leftSize = (int) leftFeetField.getValue();
+				   int rightSize = (int) rightFeetField.getValue();
+				   sizeFilters.add(new SizeFilter(leftSize, ">"));
+				   sizeFilters.add(new SizeFilter(rightSize, "<"));
+				   
+				   ArrayList<WeightFilter> weightFilters = new ArrayList<>();
+				   double leftWeight = (double) leftWeightField.getValue();
+				   double rightWeight = (double) rightWeightField.getValue();
+				   weightFilters.add(new WeightFilter(leftWeight, ">"));
+				   weightFilters.add(new WeightFilter(rightWeight, "<"));
+				   
+				   ArrayList<Pokemon> filteredPokemon = db.filterPokemon(typeFilters, genFilters, sizeFilters, weightFilters);		
 				   for(int i = 0; i < filteredPokemon.size(); i++) {
-					   System.out.println(filteredPokemon.get(i).getName() + "\t" + filteredPokemon.get(i).getGeneration() + "\t" + filteredPokemon.get(i).getTypes());
+
+					   System.out.println(filteredPokemon.get(i).toString());
 				   }
 				   
 				   try {
@@ -477,7 +583,7 @@ public class MainWindow extends JFrame {
 				           Pokemon selected = model.getElementAt(index);
 						   if(index!=-1 && selected.getName().equalsIgnoreCase(search)) {
 				                try {
-									new View(selected);
+									new NewView(selected);
 								} catch (SQLException f) {
 									f.printStackTrace();
 								}
@@ -548,7 +654,7 @@ public class MainWindow extends JFrame {
 						}
 					   }
 					   else {
-						   JOptionPane.showMessageDialog(MainWindow.this, "Error in archving Pokemon. Please try again.");
+						   JOptionPane.showMessageDialog(MainWindow.this, "Error in archiving Pokemon. Please try again.");
 					   }
 				   }
 			   }
@@ -587,11 +693,9 @@ public class MainWindow extends JFrame {
 			        if (evt.getClickCount() == 2) {
 			            Pokemon selected = list.getSelectedValue();
 			            String sampleText = "Pokemon: " + selected.getName() + "\nTypes: " + selected.getTypes() + "\nGeneration: " + selected.getGeneration() + "\nWeight: " + selected.getWeight() + "\nSize: " + selected.getSize();
-//		            	JOptionPane.showMessageDialog(MainWindow.this, sampleText, selected.getName(), JOptionPane.INFORMATION_MESSAGE);
 		                try {
-							new View(selected);
+							new NewView(selected);
 						} catch (SQLException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 			            
@@ -631,6 +735,12 @@ public class MainWindow extends JFrame {
 			   }
 			   
 		   });
+		   
+	        addWindowListener(new WindowAdapter() {
+	            public void windowClosed(WindowEvent e) {
+
+	            }
+	        });
 		   
 		   gbc.gridx = 0;
 		   gbc.gridy = 0;

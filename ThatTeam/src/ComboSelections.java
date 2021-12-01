@@ -94,6 +94,30 @@ class CustomComboCheck extends JComboBox {
 		}
 		return selectedItems;
 	}
+	
+	public ArrayList<Integer> getSelectedIndices() {
+		ArrayList<Integer> selectedIndices = new ArrayList<>();
+		for (int i = 0; i < items.size(); i++) {
+			if (items.get(i) instanceof JCheckBox) {
+				JCheckBox check = (JCheckBox) items.get(i);
+				if (selected.get(i)) {
+					selectedIndices.add(i);
+				}
+			}
+		}
+		return selectedIndices;
+	}
+	
+	public void setSelected(int index) {
+		  Object item = getItemAt(index);
+		  if (item instanceof JCheckBox) {
+			  JCheckBox check = (JCheckBox) item;
+			  check.setSelected(true);
+			  selected.set(index, true);
+		  }
+
+	}
+	
 }
 
 class ComboRenderer implements ListCellRenderer {
