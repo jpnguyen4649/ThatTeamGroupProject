@@ -161,6 +161,21 @@ public class Database {
        
    }
    
+   
+  public void resetFilters() throws SQLException {
+	  try(
+			   Statement stmt = conn.createStatement();
+	      ) {
+
+		  qb.setTypeFilters(null);
+		  qb.setGenFilters(null);
+		  qb.setSizeFilters(null);
+		  qb.setWeightFilters(null);
+		  
+	  }
+  }
+   
+   
    public ArrayList<Pokemon>  filterPokemon(ArrayList<TypeFilter> typeFilters, ArrayList<GenerationFilter> genFilters, ArrayList<SizeFilter> sizeFilters, ArrayList<WeightFilter> weightFilters) {
 	   ArrayList<Pokemon> list = new ArrayList<>();
 	   try(

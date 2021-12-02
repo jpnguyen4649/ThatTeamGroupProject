@@ -1,5 +1,7 @@
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
@@ -7,16 +9,31 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SpringLayout;
+import javax.swing.text.NumberFormatter;
 
 /**
  * This class implements a pop up view of the pokemon's information. 
@@ -27,7 +44,7 @@ import javax.swing.JTextField;
 public class View extends JFrame {
 	
 	boolean isAdmin; 
-	
+	String[] pokemonTypes = {"Poison", "Ground", "Flying", "Water", "Rock", "Ghost", "Grass", "Fighting", "Dark", "Ice", "Fairy", "Normal", "Fire", "Dragon", "Bug", "Electric", "Psychic"};
 	JLabel nameLabel;
 	JLabel typeLabel;
 	JLabel genLabel;
@@ -41,13 +58,27 @@ public class View extends JFrame {
 	JLabel pokemonSize;
 	
 	JTextField nameField;
-	JTextField typeField;
-	JTextField genField;
-	JTextField weightField;
-	JTextField sizeField;
+	CustomComboCheck typeField;
+	JSpinner genField;
+	JSpinner weightField;
+	JSpinner sizeField;
 	
-	JButton editBtn;
+	JToggleButton editBtn;
 	JButton republishBtn;
+	
+
+	public void refreshFields(Pokemon pokemon) {
+    	nameField.setText(pokemon.getName());
+    	String types = pokemon.getTypes();
+        for (String type: types.split(", ")) {
+        	int index = Arrays.asList(pokemonTypes).indexOf(type);
+        	System.out.print(type + " " + index);
+        	typeField.setSelected(index, true);
+         }
+    	genField.setValue(pokemon.getGeneration());
+    	weightField.setValue((double) pokemon.getWeight());
+    	sizeField.setValue(pokemon.getSize());
+	}
 	
 	/**
 	 * This constructs a View object that displays information about the specified Pokemon. 
@@ -62,179 +93,292 @@ public class View extends JFrame {
 		
 		Database db = Database.getInstance();
 		
-		setSize(300,300);
+		setTitle(pokemon.getName());
+		if (isAdmin) {
+			setSize(280,300);
+		}
+		else {
+			setSize(250, 250);
+		}
 		
 	    Container mainContainer = this.getContentPane();
-//	    mainContainer.setLayout(new GridLayout(6, 1, 5, 2));
 	    mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.PAGE_AXIS));
-	    nameLabel = new JLabel("Name: ");
-	    typeLabel = new JLabel("Type: ");
+
+		pokemonName = new JLabel(pokemon.getName());
+		pokemonType = new JLabel(pokemon.getTypes());
+		pokemonGen = new JLabel(String.valueOf(pokemon.getGeneration()));
+		pokemonSize = new JLabel(String.valueOf(pokemon.getSize()));
+		pokemonWeight = new JLabel(String.valueOf(pokemon.getWeight()));
+
+	    JPanel formPanel = new JPanel();
+	    SpringLayout sl_formPanel = new SpringLayout();
+	    formPanel.setLayout(sl_formPanel);
+	    
+	    JPanel formWrapper = new JPanel();
+	    formWrapper.setLayout(new BoxLayout(formWrapper, BoxLayout.PAGE_AXIS));
+	    formWrapper.add(formPanel);
+	    
+	    // Name.
+	    nameLabel= new JLabel("Name: ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, nameLabel, 20, SpringLayout.NORTH, formPanel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, nameLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(nameLabel);
+	   
+	    JPanel nameWrapper = new JPanel();
+	    nameWrapper.setLayout(new GridLayout());
+	    nameField = new JTextField();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, formPanel, 20, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, nameWrapper, 0, SpringLayout.VERTICAL_CENTER, nameLabel);
+//	    nameWrapper.add(nameField);
+	    nameWrapper.add(pokemonName);
+	    formPanel.add(nameWrapper);
+	    
+	    // Type.
+	    typeLabel = new JLabel("Types: ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, typeLabel, 15, SpringLayout.SOUTH, nameLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, typeLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(typeLabel);
+	    
+	    JPanel typeWrapper = new JPanel();
+	    typeWrapper.setLayout(new GridLayout());
+	    
+	      JTextField typeField2 = new JTextField();
+	
+		   Vector typesVector = new Vector<>();
+		   for (int i = 0; i < pokemonTypes.length; i++) {
+			   typesVector.add(new JCheckBox(pokemonTypes[i], false));
+		   }
+		   typeField = new CustomComboCheck(typesVector);
+		   
+	    sl_formPanel.putConstraint(SpringLayout.EAST, typeWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, typeWrapper, 0, SpringLayout.VERTICAL_CENTER, typeLabel);
+//	    typeWrapper.add(typeField);
+	    typeWrapper.add(pokemonType);
+	    formPanel.add(typeWrapper);
+	    
+	    // Generation.
 	    genLabel = new JLabel("Generation: ");
-	    weightLabel = new JLabel("Weight: ");
-	    sizeLabel = new JLabel("Size: ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, genLabel, 15, SpringLayout.SOUTH, typeLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, genLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(genLabel);
 	    
-	    pokemonName = new JLabel(pokemon.getName());
-	    pokemonType = new JLabel(pokemon.getTypes());
-	    pokemonGen = new JLabel(Integer.toString(pokemon.getGeneration()));
-	    pokemonWeight = new JLabel(Float.toString(pokemon.getWeight()));
-	    pokemonSize = new JLabel(Integer.toString(pokemon.getSize()));
+	    JPanel genWrapper = new JPanel();
+	    genWrapper.setLayout(new GridLayout());
+	    genField = new JSpinner();
+	    sl_formPanel.putConstraint(SpringLayout.WEST, genWrapper, 5, SpringLayout.EAST, genLabel);
+	    sl_formPanel.putConstraint(SpringLayout.EAST, genWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, genWrapper, 0, SpringLayout.VERTICAL_CENTER, genLabel);
 	    
-	    editBtn = new JButton("Edit");
+	       genField.setModel(new SpinnerNumberModel(1, 1, 9, 1));
+	       genField.setEditor(new JSpinner.NumberEditor(genField,"#"));
+
+//	    genWrapper.add(genField);
+	    genWrapper.add(pokemonGen);
+	    formPanel.add(genWrapper);
+	    
+	    // Size.
+	    sizeLabel = new JLabel("Size(in): ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, sizeLabel, 15, SpringLayout.SOUTH, genLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, sizeLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(sizeLabel);
+	    
+	    JPanel sizeWrapper = new JPanel();
+	    sizeWrapper.setLayout(new GridLayout());
+	    sizeField = new JSpinner();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, sizeWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, sizeWrapper, 0, SpringLayout.VERTICAL_CENTER, sizeLabel);
+
+	       sizeField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+	       sizeField.setEditor(new JSpinner.NumberEditor(sizeField,"#"));
+
+		   
+//	    sizeWrapper.add(sizeField);
+	    sizeWrapper.add(pokemonSize);
+	    formPanel.add(sizeWrapper);
+	    
+	    // Weight.
+	    weightLabel = new JLabel("Weight(lbs): ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, weightLabel, 15, SpringLayout.SOUTH, sizeLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, weightLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(weightLabel);
+	    
+	    JPanel weightWrapper = new JPanel();
+	    weightWrapper.setLayout(new GridLayout());
+	    weightField = new JSpinner();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, weightWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, weightWrapper, 0, SpringLayout.VERTICAL_CENTER, weightLabel);
+
+	       weightField.setModel(new SpinnerNumberModel(0, 0, 2500, 0.1));
+		   weightField.setEditor(new JSpinner.NumberEditor(weightField,"##.#"));
+		   
+//	    weightWrapper.add(weightField);
+	    weightWrapper.add(pokemonWeight);
+	    formPanel.add(weightWrapper);
+	    
+	    
+	    // Align all fields.
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  nameWrapper, 0, SpringLayout.WEST, genWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  typeWrapper, 0, SpringLayout.WEST, genWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  sizeWrapper, 0, SpringLayout.WEST, genWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  weightWrapper, 0, SpringLayout.WEST, genWrapper);
+	    
+	    
+	    getContentPane().add(formWrapper);
+	    
+	    JPanel buttonPanel = new JPanel();
+	    buttonPanel.setLayout(new FlowLayout());
+	    
+	    getContentPane().add(buttonPanel);
+	    
+	    editBtn = new JToggleButton("Edit");
 	    republishBtn = new JButton("Republish");
 	    
-	    JPanel namePanel = new JPanel();
-	    namePanel.setLayout(new GridBagLayout());
-	    namePanel.add(nameLabel);
-	    namePanel.add(pokemonName);
+	    refreshFields(pokemon);
 	    
-	    JPanel typePanel = new JPanel();
-	    typePanel.setLayout(new GridBagLayout());
-//	    typePanel.setLayout(new GridLayout(1, 2, 5, 5));
-	    typePanel.add(typeLabel);
-	    typePanel.add(pokemonType);
-	    
-	    JPanel genPanel = new JPanel();
-	    genPanel.setLayout(new GridBagLayout());
-	    genPanel.add(genLabel);
-	    genPanel.add(pokemonGen);
-	    
-	    JPanel weightPanel = new JPanel();
-	    weightPanel.setLayout(new GridBagLayout());
-	    weightPanel.add(weightLabel);
-	    weightPanel.add(pokemonWeight);	    
-	    
-	    JPanel sizePanel = new JPanel();
-	    sizePanel.setLayout(new GridBagLayout());
-	    sizePanel.add(sizeLabel);
-	    sizePanel.add(pokemonSize);
-	    
-	    nameField = new JTextField();
-	    typeField = new JTextField();
-	    genField = new JTextField();
-	    weightField = new JTextField();
-	    sizeField = new JTextField();
-
-	    getContentPane().add(namePanel);
-	    getContentPane().add(typePanel);
-	    getContentPane().add(genPanel);
-	    getContentPane().add(weightPanel);
-	    getContentPane().add(sizePanel);
 	    
 	    if (isAdmin) {
-	    	getContentPane().add(editBtn);
+//	    	getContentPane().add(editBtn);
+	    	buttonPanel.add(editBtn);
 	    	if (!pokemon.isVisible()) {
-	    		getContentPane().add(republishBtn);
+//	    		getContentPane().add(republishBtn);
+	    		buttonPanel.add(republishBtn);
 	    	}
 	    }
 	    
-	   editBtn.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
-        	   // User confirms edit.
-        	   // NOTE: This code is reused in Add.java, find a better solution later.
-        	   if (editBtn.getText() == "Confirm") {
-        		   
-        		    // Check that text field values are valid.
-	   				boolean validName = true;
-	   				boolean validType = true;
-	   				boolean validGeneration = true;
-	   				boolean validWeight = true;
-	   				boolean validSize = true;
-	   				
-	   				String name = nameField.getText();
-	   				String type = typeField.getText();
-	   				int gen = 0;
-	   				float weight = 0;
-	   				int size = 0;
-	   				try {
-	   					gen = Integer.parseInt(genField.getText());
-	   				}
-	   				catch (NumberFormatException nfe) {
-	   					
-	   				}
-	   				try {
-	   					weight = Float.parseFloat(weightField.getText());
-	   				}
-	   				catch (NumberFormatException nfe) {
-	   					
-	   				}
-	   				try {
-	   					size = Integer.parseInt(sizeField.getText());
-	   				}
-	   				catch (NumberFormatException nfe){
-	   					
-	   				}
-	   				// All fields are valid.
-	   				if (validName && validType && validGeneration && validWeight && validSize == true) {
-	   					pokemon.setName(name);
-	   					pokemon.setTypes(type);
-	   					pokemon.setGeneration(gen);
-	   					pokemon.setWeight(weight);
-	   					pokemon.setSize(size);
-	   					db.updateDatabase(pokemon);
-	   					
-	   					pokemonName.setText(pokemon.getName());
-	   					pokemonType.setText(pokemon.getTypes());
-	   					pokemonGen.setText(Integer.toString(pokemon.getGeneration()));
-	   					pokemonWeight.setText(Float.toString(pokemon.getWeight()));
-	   					pokemonSize.setText(Integer.toString(pokemon.getSize()));
-	   					
-	   					namePanel.remove(nameField);
-	   					namePanel.add(pokemonName);
-	   					typePanel.remove(typeField);
-	   					typePanel.add(pokemonType);
-	   					genPanel.remove(genField);
-	   					genPanel.add(pokemonGen);
-	   					weightPanel.remove(weightField);
-	   					weightPanel.add(pokemonWeight);
-	   					sizePanel.remove(sizeField);
-	   					sizePanel.add(pokemonSize);
-	   					
-	   					namePanel.repaint();
-	   					typePanel.repaint();
-	   					genPanel.repaint();
-	   					weightPanel.repaint();
-	   					sizePanel.repaint();
-	   					
-	   					editBtn.setText("Edit");
-	   				}
-	   				// Fields have error.
-	   				else {
-	   					
-	   				}
-        	   }
-        	   // User clicks "edit".
-        	   else {
-            	   nameField.setText(pokemonName.getText());
-            	   typeField.setText(pokemonType.getText());
-            	   genField.setText(pokemonGen.getText());
-            	   weightField.setText(pokemonWeight.getText());
-            	   sizeField.setText(pokemonSize.getText());
-            	   
-            	   namePanel.remove(pokemonName);
-            	   namePanel.add(nameField);
-            	   typePanel.remove(pokemonType);
-            	   typePanel.add(typeField);
-            	   genPanel.remove(pokemonGen);
-            	   genPanel.add(genField);
-            	   weightPanel.remove(pokemonWeight);
-            	   weightPanel.add(weightField);
-            	   sizePanel.remove(pokemonSize);
-            	   sizePanel.add(sizeField);
-            	   
-            	   namePanel.repaint();
-            	   typePanel.repaint();
-            	   genPanel.repaint();
-            	   weightPanel.repaint();
-            	   sizePanel.repaint();
-        		   
-        	   }
-        	   
-        	   
-        	   editBtn.setText("Confirm");
-           }
-       });
+	    
+	    ItemListener itemListener = new ItemListener() {
+	    	 
+            public void itemStateChanged(ItemEvent itemEvent)
+            {
+ 
+                int state = itemEvent.getStateChange();
+                
+                // Edit Mode ON.
+                if (state == ItemEvent.SELECTED) {
+                	
+                   editBtn.setText("Confirm");
+                	
+              	   nameWrapper.add(nameField);
+              	   nameWrapper.remove(pokemonName);
+              	   typeWrapper.add(typeField);
+              	   typeWrapper.remove(pokemonType);
+              	   genWrapper.add(genField);
+              	   genWrapper.remove(pokemonGen);
+              	   weightWrapper.add(weightField);
+              	   weightWrapper.remove(pokemonWeight);
+              	   sizeWrapper.add(sizeField);
+              	   sizeWrapper.remove(pokemonSize);
+                	
+                    System.out.println("Selected");
+                }
+                // Edit Mode OFF.
+                else {
+                	
+                	editBtn.setText("Edit");
+                	
+                	// Pokemon data to update in database.
+                	String name = nameField.getText();
+                	ArrayList<String> selectedTypes = typeField.getSelected();
+                	String types = String.join(", ", selectedTypes);
+                	int gen = (int) genField.getValue();
+                	int size = (int) sizeField.getValue();
+                	double weight = (double) weightField.getValue();
+                	DecimalFormat df = new DecimalFormat("#.#");
+                	double roundedWeight = Double.valueOf(df.format(weight));
+                	
+                	pokemon.setName(name);
+                	pokemon.setTypes(types);
+                	pokemon.setGeneration(gen);
+                	pokemon.setSize(size);
+                	pokemon.setWeight((float)roundedWeight);
+                	db.updateDatabase(pokemon);
+                	
+                	refreshFields(pokemon);
+                	
+                	System.out.println(name);
+                	System.out.println(types);
+                	System.out.println(gen);
+                	System.out.println(size);
+                	System.out.println(weight);
+
+
+ 	        	   pokemonName.setText(pokemon.getName());
+ 	        	   pokemonType.setText(pokemon.getTypes());
+ 	        	   pokemonGen.setText(Integer.toString(pokemon.getGeneration()));
+ 	        	   pokemonWeight.setText(Float.toString(pokemon.getWeight()));
+ 	        	   pokemonSize.setText(Integer.toString(pokemon.getSize()));
+             	   
+             	   nameWrapper.remove(nameField);
+             	   nameWrapper.add(pokemonName);
+             	   typeWrapper.remove(typeField);
+             	   typeWrapper.add(pokemonType);
+             	   genWrapper.remove(genField);
+             	   genWrapper.add(pokemonGen);
+             	   weightWrapper.remove(weightField);
+             	   weightWrapper.add(pokemonWeight);
+             	   sizeWrapper.remove(sizeField);
+             	   sizeWrapper.add(pokemonSize);
+
+                    System.out.println("Deselected");
+                    
+                }
+                
+          	   nameWrapper.revalidate();
+          	   typeWrapper.validate();
+          	   genWrapper.validate();
+          	   weightWrapper.validate();
+          	   sizeWrapper.validate();
+          	   nameWrapper.repaint();
+          	   typeWrapper.repaint();
+          	   genWrapper.repaint();
+          	   weightWrapper.repaint();
+          	   sizeWrapper.repaint();
+            }
+        };
+       
+        addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+            	try {
+					MainWindow.refreshArchived();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            }
+        });
+        
+        editBtn.addItemListener(itemListener);
+	    
+	    republishBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (db.republishPokemon(pokemon)) {
+					   JOptionPane.showMessageDialog(View.this, "Successfully republished Pokemon.");
+					   dispose();
+				   }
+				   else {
+					   JOptionPane.showMessageDialog(View.this, "Error in republishing Pokemon. Please try again.");
+				   }
+				
+			}
+	    	
+	    });
 	
 		setVisible(true);
 	}
+	
+	   public static void main(String[] args) {
+	      EventQueue.invokeLater(
+	         new Runnable() {
+	            public void run() {
+	               try {
+	                  View window = new View(new Pokemon("Pikachu", "Electric", 1, 13, 6, false));
+	                  window.setVisible(true);
+	               } catch (Exception e) {
+	                  e.printStackTrace();
+	               }
+	            }
+	         });
+	   }
 }

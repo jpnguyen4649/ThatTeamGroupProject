@@ -1,206 +1,261 @@
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Vector;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-
-import java.awt.Font;
-import javax.swing.JTextPane;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.sql.SQLException;
-import java.awt.event.ActionEvent;
+import javax.swing.JToggleButton;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SpringLayout;
+import javax.swing.text.NumberFormatter;
+
 /**
- * This class implements a pop up frame where admins can enter information about a Pokemon to be added into the database.
+ * This class implements a pop up view of the pokemon's information. 
  * @author rachelmao
  *
  */
-public class Add {
 
-	private JFrame frmThatAdd;
-	private JTextField nameField;
-	private JTextField typeField;
-	private JTextField genField;
-	private JTextField weightField;
-	private JTextField sizeField;
-
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					Add window = new Add();
-					window.frmThatAdd.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+public class Add extends JFrame {
+	
+	String[] pokemonTypes = {"Poison", "Ground", "Flying", "Water", "Rock", "Ghost", "Grass", "Fighting", "Dark", "Ice", "Fairy", "Normal", "Fire", "Dragon", "Bug", "Electric", "Psychic"};
+	JLabel nameLabel;
+	JLabel typeLabel;
+	JLabel genLabel;
+	JLabel weightLabel;
+	JLabel sizeLabel;
+	
+	JTextField nameField;
+	CustomComboCheck typeField;
+	JSpinner genField;
+	JSpinner weightField;
+	JSpinner sizeField;
 	
 	/**
-	 * Create the application.
-	 * @throws SQLException 
+	 * This constructs a View object that displays information about the specified Pokemon. 
+	 * @param pokemon
+	 * @throws SQLException
 	 */
-	public Add() throws SQLException {
-		initialize();
-	}
-
-	/**
-	 * Initialize the contents of the frame.
-	 * @throws SQLException 
-	 */
-	private void initialize() throws SQLException {
+	public Add () throws SQLException {
+		
+		
 		Database db = Database.getInstance();
 		
-		frmThatAdd = new JFrame();
-		frmThatAdd.setTitle("That Add");
-		frmThatAdd.setBounds(100, 100, 450, 300);
-		frmThatAdd.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frmThatAdd.getContentPane().setLayout(null);
+		setTitle("Add Pokemon");
+		setSize(300,280);
+
 		
-		JLabel lblNewLabel = new JLabel("Name :");
-		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNewLabel.setBounds(48, 21, 70, 35);
-		frmThatAdd.getContentPane().add(lblNewLabel);
-		
-		JLabel lblType = new JLabel("Type :");
-		lblType.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblType.setBounds(48, 52, 70, 35);
-		frmThatAdd.getContentPane().add(lblType);
-		
-		JLabel lblGeneration = new JLabel("Generation :");
-		lblGeneration.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblGeneration.setBounds(48, 83, 89, 35);
-		frmThatAdd.getContentPane().add(lblGeneration);
-		
-		JLabel lblWeight = new JLabel("Weight :");
-		lblWeight.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblWeight.setBounds(48, 115, 89, 35);
-		frmThatAdd.getContentPane().add(lblWeight);
-		
-		JLabel lblSize = new JLabel("Size :");
-		lblSize.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblSize.setBounds(48, 145, 89, 35);
-		frmThatAdd.getContentPane().add(lblSize);
-		
-		nameField = new JTextField();
-		nameField.setBounds(135, 31, 188, 19);
-		frmThatAdd.getContentPane().add(nameField);
-		nameField.setColumns(10);
-		
-		typeField = new JTextField();
-		typeField.setColumns(10);
-		typeField.setBounds(135, 62, 188, 19);
-		frmThatAdd.getContentPane().add(typeField);
-		
-		genField = new JTextField();
-		genField.setColumns(10);
-		genField.setBounds(135, 93, 188, 19);
-		frmThatAdd.getContentPane().add(genField);
-		
-		weightField = new JTextField();
-		weightField.setColumns(10);
-		weightField.setBounds(135, 125, 188, 19);
-		frmThatAdd.getContentPane().add(weightField);
-		
-		sizeField = new JTextField();
-		sizeField.setColumns(10);
-		sizeField.setBounds(135, 155, 188, 19);
-		frmThatAdd.getContentPane().add(sizeField);
-		
-		JButton btnNewButton = new JButton("Add");
-		btnNewButton.addActionListener(new ActionListener() {
+	    Container mainContainer = this.getContentPane();
+	    mainContainer.setLayout(new BoxLayout(mainContainer, BoxLayout.PAGE_AXIS));
+
+	    JPanel formPanel = new JPanel();
+	    SpringLayout sl_formPanel = new SpringLayout();
+	    formPanel.setLayout(sl_formPanel);
+	    
+	    
+	    
+	    JPanel formWrapper = new JPanel();
+	    formWrapper.setLayout(new BoxLayout(formWrapper, BoxLayout.PAGE_AXIS));
+	    formWrapper.add(formPanel);
+	    
+	    // Name.
+	    nameLabel= new JLabel("Name: ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, nameLabel, 20, SpringLayout.NORTH, formPanel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, nameLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(nameLabel);
+	   
+	    JPanel nameWrapper = new JPanel();
+	    nameWrapper.setLayout(new GridLayout());
+	    nameField = new JTextField();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, formPanel, 20, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, nameWrapper, 0, SpringLayout.VERTICAL_CENTER, nameLabel);
+	    nameWrapper.add(nameField);
+	    formPanel.add(nameWrapper);
+	    
+	    // Type.
+	    typeLabel = new JLabel("Types: ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, typeLabel, 15, SpringLayout.SOUTH, nameLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, typeLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(typeLabel);
+	    
+	    JPanel typeWrapper = new JPanel();
+	    typeWrapper.setLayout(new GridLayout());
+	    
+	      JTextField typeField2 = new JTextField();
+	
+		   Vector typesVector = new Vector<>();
+		   for (int i = 0; i < pokemonTypes.length; i++) {
+			   typesVector.add(new JCheckBox(pokemonTypes[i], false));
+		   }
+		   typeField = new CustomComboCheck(typesVector);
+		   
+	    sl_formPanel.putConstraint(SpringLayout.EAST, typeWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, typeWrapper, 0, SpringLayout.VERTICAL_CENTER, typeLabel);
+	    typeWrapper.add(typeField);
+	    formPanel.add(typeWrapper);
+	    
+	    // Generation.
+	    genLabel = new JLabel("Generation: ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, genLabel, 15, SpringLayout.SOUTH, typeLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, genLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(genLabel);
+	    
+	    JPanel genWrapper = new JPanel();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, genWrapper, -20, SpringLayout.EAST, formPanel);
+	    genWrapper.setLayout(new GridLayout());
+	    genField = new JSpinner();
+	    sl_formPanel.putConstraint(SpringLayout.WEST, genWrapper, 5, SpringLayout.EAST, genLabel);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, genWrapper, 0, SpringLayout.VERTICAL_CENTER, genLabel);
+	    
+	       genField.setModel(new SpinnerNumberModel(1, 1, 9, 1));
+	       genField.setEditor(new JSpinner.NumberEditor(genField,"#"));
+
+	    genWrapper.add(genField);
+	    formPanel.add(genWrapper);
+	    
+	    // Size.
+	    sizeLabel = new JLabel("Size(in): ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, sizeLabel, 15, SpringLayout.SOUTH, genLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, sizeLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(sizeLabel);
+	    
+	    JPanel sizeWrapper = new JPanel();
+	    sizeWrapper.setLayout(new GridLayout());
+	    sizeField = new JSpinner();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, sizeWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, sizeWrapper, 0, SpringLayout.VERTICAL_CENTER, sizeLabel);
+
+	       sizeField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+	       sizeField.setEditor(new JSpinner.NumberEditor(sizeField,"#"));
+
+		   
+	    sizeWrapper.add(sizeField);
+	    formPanel.add(sizeWrapper);
+	    
+	    // Weight.
+	    weightLabel = new JLabel("Weight(lbs): ");
+	    sl_formPanel.putConstraint(SpringLayout.NORTH, weightLabel, 15, SpringLayout.SOUTH, sizeLabel);
+	    sl_formPanel.putConstraint(SpringLayout.WEST, weightLabel, 20, SpringLayout.WEST, formPanel);
+	    formPanel.add(weightLabel);
+	    
+	    JPanel weightWrapper = new JPanel();
+	    weightWrapper.setLayout(new GridLayout());
+	    weightField = new JSpinner();
+	    sl_formPanel.putConstraint(SpringLayout.EAST, weightWrapper, 0, SpringLayout.EAST, nameWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.VERTICAL_CENTER, weightWrapper, 0, SpringLayout.VERTICAL_CENTER, weightLabel);
+
+	       weightField.setModel(new SpinnerNumberModel(0, 0, 2500, 0.1));
+		   weightField.setEditor(new JSpinner.NumberEditor(weightField,"##.#"));
+		   
+	    weightWrapper.add(weightField);
+	    formPanel.add(weightWrapper);
+	    
+	    JPanel buttonPanel = new JPanel();
+	    buttonPanel.setLayout(new FlowLayout());
+	    JButton cancelBtn = new JButton("Cancel");
+	    JButton addBtn = new JButton("Add");
+	    buttonPanel.add(cancelBtn);
+	    buttonPanel.add(addBtn);
+	    
+	    mainContainer.add(formWrapper);
+	    mainContainer.add(buttonPanel);
+	    
+	    
+	    // Align all fields.
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  nameWrapper, 0, SpringLayout.WEST, genWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  typeWrapper, 0, SpringLayout.WEST, genWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  sizeWrapper, 0, SpringLayout.WEST, genWrapper);
+	    sl_formPanel.putConstraint(SpringLayout.WEST,  weightWrapper, 0, SpringLayout.WEST, genWrapper);
+	    
+	    
+	    
+	    addBtn.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				// Check that text field values are valid.
-				boolean validName = true;
-				boolean validType = true;
-				boolean validGeneration = true;
-				boolean validWeight = true;
-				boolean validSize = true;
-				
 				String name = nameField.getText();
-				String type = typeField.getText();
-				int gen = 0;
-				float weight = 0;
-				int size = 0;
-				try {
-					gen = Integer.parseInt(genField.getText());
+            	ArrayList<String> selectedTypes = typeField.getSelected();
+            	String types = String.join(", ", selectedTypes);
+            	int gen = (int) genField.getValue();
+            	int size = (int) sizeField.getValue();
+            	double weight = (double) weightField.getValue();
+            	DecimalFormat df = new DecimalFormat("#.#");
+            	float roundedWeight = Float.valueOf(df.format(weight));
+            	
+            	Pokemon pokemon = new Pokemon(name, types, gen, roundedWeight, size, true);
+            	if (db.addPokemon(pokemon)) {
+					JOptionPane.showMessageDialog(null, "Successfully added Pokemon.");
+					dispose();
 				}
-				catch (NumberFormatException nfe) {
-					
-				}
-				try {
-					weight = Float.parseFloat(weightField.getText());
-				}
-				catch (NumberFormatException nfe) {
-					
-				}
-				try {
-					size = Integer.parseInt(sizeField.getText());
-				}
-				catch (NumberFormatException nfe){
-					
-				}
-				// All fields are valid.
-				if (validName && validType && validGeneration && validWeight && validSize == true) {
-					Pokemon pokemon = new Pokemon(name, type, gen, weight, size, true);
-					if (db.addPokemon(pokemon)) {
-						JOptionPane.showMessageDialog(frmThatAdd, "Successfully added Pokemon.");
-						frmThatAdd.dispose();
-					}
-					else {
-						JOptionPane.showMessageDialog(frmThatAdd, "Error in adding Pokemon. Please try again.");
-					}
-				}
-				// Fields have error.
 				else {
-					
+					JOptionPane.showMessageDialog(null, "Error in adding Pokemon. Please try again.");
 				}
 				
 			}
-		});
-		btnNewButton.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnNewButton.setBounds(234, 184, 89, 26);
-		frmThatAdd.getContentPane().add(btnNewButton);
-		
-		//Back button is made to go back to the Admin's pokedex
-		JButton btnCancdel = new JButton("Back");
-		btnCancdel.addActionListener(new ActionListener() {
+	    	
+	    });
+	    
+	    cancelBtn.addActionListener(new ActionListener() {
+
+			@Override
 			public void actionPerformed(ActionEvent e) {
-				try {
-					MainWindow main = new MainWindow();
+				dispose();
+				
+			}
+	    	
+	    });
+
+       
+        addWindowListener(new WindowAdapter() {
+            public void windowClosed(WindowEvent e) {
+            	try {
+            		MainWindow.refreshArchived();
 				} catch (SQLException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				} 
-	            MainWindow.main(null);
-				frmThatAdd.dispose();
-				
-			}
-		});
-		btnCancdel.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnCancdel.setBounds(333, 227, 89, 26);
-		frmThatAdd.getContentPane().add(btnCancdel);
-		
-		//Reset button is made to erase everything that you inputted
-		JButton btnReset = new JButton("Reset");
-		btnReset.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				nameField.setText(null);
-				typeField.setText(null);
-				genField.setText(null);
-				weightField.setText(null);
-				sizeField.setText(null);
-			}
-		});
-		btnReset.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		btnReset.setBounds(135, 184, 89, 26);
-		frmThatAdd.getContentPane().add(btnReset);
+				}
+            }
+        });
+        
+
+		setVisible(true);
 	}
+	
+	   public static void main(String[] args) {
+	      EventQueue.invokeLater(
+	         new Runnable() {
+	            public void run() {
+	               try {
+	            	   Add window = new Add();
+	                  window.setVisible(true);
+	               } catch (Exception e) {
+	                  e.printStackTrace();
+	               }
+	            }
+	         });
+	   }
 }

@@ -108,12 +108,12 @@ class CustomComboCheck extends JComboBox {
 		return selectedIndices;
 	}
 	
-	public void setSelected(int index) {
+	public void setSelected(int index, boolean selectState) {
 		  Object item = getItemAt(index);
 		  if (item instanceof JCheckBox) {
 			  JCheckBox check = (JCheckBox) item;
-			  check.setSelected(true);
-			  selected.set(index, true);
+			  check.setSelected(selectState);
+			  selected.set(index, selectState);
 		  }
 
 	}

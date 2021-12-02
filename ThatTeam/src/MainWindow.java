@@ -95,7 +95,6 @@ class PokemonCellRenderer extends JLabel implements ListCellRenderer  {
 		}
 		return this;
 	}
-	
 }
 
 /**
@@ -122,15 +121,10 @@ public class MainWindow extends JFrame {
 	JLabel sizeFilterLabel;
 	JSpinner leftFeetField;
 	JLabel leftSizeFeetLabel;
-	JSpinner leftInchField;
-	JLabel leftSizeInchLabel;
 	
 	JLabel sizeDashLabel;
-	
 	JSpinner rightFeetField;
 	JLabel rightSizeFeetLabel;
-	JSpinner rightInchField;
-	JLabel rightSizeInchLabel;
 
 	
 	JLabel weightFilterLabel;
@@ -141,6 +135,7 @@ public class MainWindow extends JFrame {
 	JLabel rightWeightUnitLabel;
 	
 	JButton applyFilterBtn;
+	JButton resetFilterBtn;
 	
 	// List GUI components.
 	JScrollPane scrollPane;
@@ -202,6 +197,7 @@ public class MainWindow extends JFrame {
 			   }
 		   }
 	   }
+
 	   
 // refresh the sorted Pokemon list
 	   
@@ -349,77 +345,51 @@ public class MainWindow extends JFrame {
 		   model = new DefaultListModel<>();
 		   refreshArchived();
 		   
- 
 		   JList<Pokemon> list = new JList<Pokemon>(model);
 		   list.setCellRenderer(new PokemonCellRenderer());
 
 		   
 		   // GUI designing.
-		   setSize(450, 450);
+		   setSize(520, 530);
 		   setTitle("That Pokedex");
+		   setResizable(false);
 		   Container mainContainer = this.getContentPane();
-		   mainContainer.setLayout(new GridBagLayout());
-		   gbc.insets = new Insets(5, 5, 5, 5);
-//		   SpringLayout mainLayout = new SpringLayout();
-//		   mainContainer.setLayout(mainLayout);
-//		   
-		   // List Panel.
-		   JPanel listPanel = new JPanel();
-		   listPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-//		   listPanel.setLayout(new GridLayout(2, 1, 5, 5));  
-		   SpringLayout listLayout = new SpringLayout();
-		   listPanel.setLayout(listLayout);
-		   listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.PAGE_AXIS));
+		   SpringLayout springLayout = new SpringLayout();
+		   getContentPane().setLayout(springLayout);
+		   
 		   scrollPane = new JScrollPane();
 		   scrollPane.setViewportView(list);
-//		   scrollPane.setPreferredSize(new Dimension(200, 150));
-		   listLayout.putConstraint(SpringLayout.NORTH, scrollPane, 10, SpringLayout.NORTH, listPanel);
-		   listLayout.putConstraint(SpringLayout.WEST, scrollPane, 10, SpringLayout.WEST, listPanel);
-		    
+		   springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 15, SpringLayout.NORTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.WEST, scrollPane, 15, SpringLayout.WEST, getContentPane());
+		   springLayout.putConstraint(SpringLayout.SOUTH, scrollPane, -109, SpringLayout.SOUTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.EAST, scrollPane, 266, SpringLayout.WEST, getContentPane());
+		   getContentPane().add(scrollPane);
 		   
-		   JPanel sortPanel = new JPanel();
-		   sortPanel.setLayout(new FlowLayout(3, 4, 4));
-		   sortLabel = new JLabel("Sort:");
-		   sortLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
-		   
-		   String[] choices = {"Select One", "Alphabetically", "Type", "Generation", "Size", "Weight"};
-		   sortCb = new JComboBox<String>(choices);
-		   sortPanel.add(sortLabel);
-		   sortPanel.add(sortCb);
-		   
-		   listLayout.putConstraint(SpringLayout.SOUTH, sortPanel, 10, SpringLayout.SOUTH, listPanel);
-		   
-		   listPanel.add(scrollPane);
-		   listPanel.add(sortPanel);
-		   
-		   
-		   
-//		   mainLayout.putConstraint(SpringLayout.NORTH, listPanel, 10, SpringLayout.NORTH, mainContainer);
-//		   mainLayout.putConstraint(SpringLayout.WEST, listPanel, 10, SpringLayout.WEST, mainContainer);
-		   
-		   // Filter Panel.
 		   JPanel filterPanel = new JPanel();
-		   filterPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-//		   filterPanel.setLayout(new GridLayout(10, 1, 5, 5));
+		   springLayout.putConstraint(SpringLayout.WEST, filterPanel, 16, SpringLayout.EAST, scrollPane);
+		   springLayout.putConstraint(SpringLayout.SOUTH, filterPanel, -102, SpringLayout.SOUTH, scrollPane);
+		   springLayout.putConstraint(SpringLayout.EAST, filterPanel, -15, SpringLayout.EAST, getContentPane());
+		   springLayout.putConstraint(SpringLayout.NORTH, filterPanel, 15, SpringLayout.NORTH, getContentPane());
+		   getContentPane().add(filterPanel);
+		   
+// ================ START FILTER ================
 		   filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.PAGE_AXIS));
-//		   filterPanel.setAlignmentX(Component._ALIGNMENT);
 		   
 		   JPanel filterLabelPanel = new JPanel();
 		   filterLabelPanel.setAlignmentX(LEFT_ALIGNMENT);
 		   
 		   filterLabel = new JLabel("Filter:");
 		   filterLabel.setAlignmentX(CENTER_ALIGNMENT);
-		   filterLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
 		   filterLabelPanel.add(filterLabel);
 		   
-		   typeFilterLabel = new JLabel("Type");
+		   typeFilterLabel = new JLabel(" Type");
 		   typeFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		   typeFilterLabel.setHorizontalAlignment(SwingConstants.LEFT);
-		   genFilterLabel = new JLabel("Generation");
+		   genFilterLabel = new JLabel(" Generation");
 		   genFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		   sizeFilterLabel = new JLabel("Size");
+		   sizeFilterLabel = new JLabel(" Size");
 		   sizeFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-		   weightFilterLabel = new JLabel("Weight");
+		   weightFilterLabel = new JLabel(" Weight");
 		   weightFilterLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		   
 
@@ -439,61 +409,37 @@ public class MainWindow extends JFrame {
 		   }
 		   genFilterCb = new CustomComboCheck(gensVector);
 		   
-		   
-
-		   
 		   // Size Panel. 
 		   JPanel sizePanel = new JPanel();
 		   sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.LINE_AXIS)); 
-//		   sizePanel.setLayout(new GridLayout(1, 9));
 		   
 		   leftFeetField = new JSpinner();
-		   leftFeetField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
+		   leftFeetField.setModel(new SpinnerNumberModel(0, 0, 100, 1));
 		   leftFeetField.setEditor(new JSpinner.NumberEditor(leftFeetField,"#"));
 		   leftSizeFeetLabel = new JLabel("ft.");
-		   
-		   leftInchField = new JSpinner();
-		   leftInchField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
-		   leftInchField.setEditor(new JSpinner.NumberEditor(leftInchField,""));
-		   JFormattedTextField leftInchEditor = ((JSpinner.NumberEditor) leftInchField.getEditor()).getTextField();
-		   ((NumberFormatter) leftInchEditor.getFormatter()).setAllowsInvalid(false);
-		   leftSizeInchLabel = new JLabel("in.");
-		   
 		   sizeDashLabel = new JLabel("-");
-		   
 		   rightFeetField = new JSpinner();
-		   rightFeetField.setModel(new SpinnerNumberModel(1000, 0, 1000, 1));
+		   rightFeetField.setModel(new SpinnerNumberModel(100, 0, 100, 1));
 		   rightFeetField.setEditor(new JSpinner.NumberEditor(rightFeetField,""));
 		   rightFeetField.setEditor(new JSpinner.NumberEditor(rightFeetField,"#"));
 		   rightSizeFeetLabel = new JLabel("ft.");
 		   
-		   rightInchField = new JSpinner();
-		   rightInchField.setModel(new SpinnerNumberModel(0, 0, 1000, 1));
-		   rightInchField.setEditor(new JSpinner.NumberEditor(rightInchField,""));
-		   JFormattedTextField rightInchEditor = ((JSpinner.NumberEditor) rightInchField.getEditor()).getTextField();
-		   ((NumberFormatter) rightInchEditor.getFormatter()).setAllowsInvalid(false);
-		   rightSizeInchLabel = new JLabel("in.");
-		   
 		   sizePanel.add(leftFeetField);
 		   sizePanel.add(leftSizeFeetLabel);
-//		   sizePanel.add(leftInchField);
-//		   sizePanel.add(leftSizeInchLabel);
 		   sizePanel.add(sizeDashLabel);
 		   sizePanel.add(rightFeetField);
 		   sizePanel.add(rightSizeFeetLabel);
-//		   sizePanel.add(rightInchField);
-//		   sizePanel.add(rightSizeInchLabel);
 		   
 		   // Weight Panel.
 		   JPanel weightPanel = new JPanel();
 		   weightPanel.setLayout(new BoxLayout(weightPanel, BoxLayout.LINE_AXIS));
 		   leftWeightField = new JSpinner();
-		   leftWeightField.setModel(new SpinnerNumberModel(0, 0, 10000, 0.1));
+		   leftWeightField.setModel(new SpinnerNumberModel(0, 0, 2500, 0.1));
 		   leftWeightField.setEditor(new JSpinner.NumberEditor(leftWeightField,"##.#"));
 		   leftWeightUnitLabel = new JLabel("lbs.");
 		   weightDashLabel = new JLabel("-");
 		   rightWeightField = new JSpinner();
-		   rightWeightField.setModel(new SpinnerNumberModel(10000, 0, 10000, 0.1));
+		   rightWeightField.setModel(new SpinnerNumberModel(2500, 0, 2500, 0.1));
 		   rightWeightField.setEditor(new JSpinner.NumberEditor(rightWeightField,"##.#"));
 		   rightWeightUnitLabel = new JLabel("lbs.");
 		   
@@ -503,7 +449,6 @@ public class MainWindow extends JFrame {
 		   weightPanel.add(rightWeightField);
 		   weightPanel.add(rightWeightUnitLabel);
 		   
-
 		   typeFilterCb.setAlignmentX(LEFT_ALIGNMENT);
 		   genFilterCb.setAlignmentX(LEFT_ALIGNMENT);
 		   sizePanel.setAlignmentX(LEFT_ALIGNMENT);
@@ -512,26 +457,92 @@ public class MainWindow extends JFrame {
 		   JPanel applyBtnPanel = new JPanel();
 		   applyBtnPanel.setAlignmentX(LEFT_ALIGNMENT);
 		   applyFilterBtn = new JButton("Apply");
-		   applyFilterBtn.setAlignmentX(CENTER_ALIGNMENT);
+		   resetFilterBtn = new JButton("Reset");
+//		   applyFilterBtn.setAlignmentX(CENTER_ALIGNMENT);
 		   applyBtnPanel.add(applyFilterBtn);
+		   applyBtnPanel.add(resetFilterBtn);
 		   
-//		   filterPanel.add(filterLabel);
 		   filterPanel.add(filterLabelPanel);
 		   filterPanel.add(typeFilterLabel);
 		   filterPanel.add(typeFilterCb);
 		   filterPanel.add(genFilterLabel);
 		   filterPanel.add(genFilterCb);
 		   filterPanel.add(sizeFilterLabel);
-//		   filterPanel.add(sizeFilterCb);
 		   filterPanel.add(sizePanel);
 		   filterPanel.add(weightFilterLabel);
-//		   filterPanel.add(weightFilterCb);
 		   filterPanel.add(weightPanel);
-//		   filterPanel.add(applyFilterBtn);
 		   filterPanel.add(applyBtnPanel);
 		   
 		   
+// ================ END FILTER ================
 		   
+		   JPanel sortPanel = new JPanel();
+		   springLayout.putConstraint(SpringLayout.NORTH, sortPanel, 398, SpringLayout.NORTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.WEST, sortPanel, 15, SpringLayout.WEST, getContentPane());
+		   springLayout.putConstraint(SpringLayout.SOUTH, sortPanel, -62, SpringLayout.SOUTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.EAST, sortPanel, -254, SpringLayout.EAST, getContentPane());
+		   getContentPane().add(sortPanel);
+		   sortPanel.setLayout(new BoxLayout(sortPanel, BoxLayout.X_AXIS));
+		   
+
+		   sortLabel = new JLabel("Sort: ");
+		   sortPanel.add(sortLabel);
+
+		   String[] choices = {"Select One", "Alphabetically", "Type", "Generation", "Size", "Weight"};
+		   sortCb = new JComboBox(choices);
+		   
+		   sortPanel.add(sortCb);
+		   
+		   JPanel panel = new JPanel();
+		   springLayout.putConstraint(SpringLayout.NORTH, panel, 5, SpringLayout.SOUTH, sortPanel);
+		   springLayout.putConstraint(SpringLayout.WEST, panel, 15, SpringLayout.WEST, getContentPane());
+		   springLayout.putConstraint(SpringLayout.SOUTH, panel, -10, SpringLayout.SOUTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.EAST, panel, -254, SpringLayout.EAST, getContentPane());
+		   getContentPane().add(panel);
+		   SpringLayout sl_panel = new SpringLayout();
+		   panel.setLayout(sl_panel);
+		   
+		   searchLabel = new JLabel("Search: ");
+		   sl_panel.putConstraint(SpringLayout.NORTH, searchLabel, 0, SpringLayout.NORTH, panel);
+		   sl_panel.putConstraint(SpringLayout.WEST, searchLabel, 0, SpringLayout.WEST, panel);
+		   panel.add(searchLabel);
+		   
+		   searchField = new JTextField();
+		   sl_panel.putConstraint(SpringLayout.NORTH, searchField, 6, SpringLayout.SOUTH, searchLabel);
+		   sl_panel.putConstraint(SpringLayout.WEST, searchField, 0, SpringLayout.WEST, panel);
+		   panel.add(searchField);
+		   searchField.setColumns(10);
+		   
+		   searchBtn = new JButton("Search");
+		   
+		   sl_panel.putConstraint(SpringLayout.EAST, searchField, -6, SpringLayout.WEST, searchBtn);
+		   sl_panel.putConstraint(SpringLayout.NORTH, searchBtn, 22, SpringLayout.NORTH, panel);
+		   sl_panel.putConstraint(SpringLayout.EAST, searchBtn, 0, SpringLayout.EAST, panel);
+		   panel.add(searchBtn);
+		   
+		   JPanel controlPanel = new JPanel();
+		   springLayout.putConstraint(SpringLayout.NORTH, controlPanel, 443, SpringLayout.NORTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.SOUTH, controlPanel, -10, SpringLayout.SOUTH, getContentPane());
+		   springLayout.putConstraint(SpringLayout.WEST, controlPanel, 0, SpringLayout.WEST, filterPanel);
+		   springLayout.putConstraint(SpringLayout.EAST, controlPanel, 0, SpringLayout.EAST, filterPanel);
+		   getContentPane().add(controlPanel);
+		   controlPanel.setLayout(new GridLayout(2, 2, 3, 3));
+		   
+		   archiveBtn = new JButton("Archive");
+		   aboutBtn = new JButton("About");
+		   addBtn = new JButton("Add");
+		   logoutBtn = new JButton("Logout");
+
+
+		   if (isAdmin) {
+			   controlPanel.add(addBtn);
+			   controlPanel.add(archiveBtn);
+		   }
+		   controlPanel.add(aboutBtn);
+		   controlPanel.add(logoutBtn);
+		   
+		   // Event Listeners.
+
 		   applyFilterBtn.addActionListener(new ActionListener() {
 			   public void actionPerformed(ActionEvent e) {
 
@@ -550,8 +561,8 @@ public class MainWindow extends JFrame {
 				   ArrayList<SizeFilter> sizeFilters = new ArrayList<> ();
 				   int leftSize = (int) leftFeetField.getValue();
 				   int rightSize = (int) rightFeetField.getValue();
-				   sizeFilters.add(new SizeFilter(leftSize, ">"));
-				   sizeFilters.add(new SizeFilter(rightSize, "<"));
+				   sizeFilters.add(new SizeFilter(leftSize * 12, ">"));
+				   sizeFilters.add(new SizeFilter(rightSize * 12, "<"));
 				   
 				   ArrayList<WeightFilter> weightFilters = new ArrayList<>();
 				   double leftWeight = (double) leftWeightField.getValue();
@@ -568,26 +579,42 @@ public class MainWindow extends JFrame {
 				   try {
 					refreshArchived();
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 			   }
 		   });
 		   
-		   
-		   
-		   // Search Panel.
-		   
-		   JPanel searchPanel = new JPanel();
-		   searchPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		   searchPanel.setLayout(new GridLayout(2, 1, 5, 5));
-		   searchLabel = new JLabel("Search:");
-		   searchLabel.setFont(new Font("Tahoma", Font.BOLD, 16));
-		   JPanel searchBarPanel = new JPanel();
-		   searchBarPanel.setLayout(new FlowLayout(2, 1, 0));
-		   searchField = new JTextField("Name: ", 8);
-		   
-		   searchBtn = new JButton("Search");
+		   resetFilterBtn.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					db.resetFilters();
+					ArrayList<Integer> typeSelectedIndices = typeFilterCb.getSelectedIndices();
+					for (int i = 0; i < typeSelectedIndices.size(); i++) {
+						typeFilterCb.setSelected(typeSelectedIndices.get(i), false);
+						System.out.println(typeSelectedIndices.get(i));
+					}
+					ArrayList<Integer> genSelectedIndices = genFilterCb.getSelectedIndices();
+					for (int i = 0; i < genSelectedIndices.size(); i++) {
+						genFilterCb.setSelected(genSelectedIndices.get(i), false);
+					}
+					leftFeetField.setValue(0);
+					rightFeetField.setValue(100);
+					leftWeightField.setValue(0);
+					rightWeightField.setValue(2500);
+					typeFilterCb.repaint();
+					genFilterCb.repaint();
+					
+					
+					refreshArchived();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+				
+			}
+			   
+		   });
 		   
 		   searchBtn.addActionListener(new ActionListener() {
 			   public void actionPerformed(ActionEvent e) {
@@ -600,7 +627,7 @@ public class MainWindow extends JFrame {
 				           Pokemon selected = model.getElementAt(index);
 						   if(index!=-1 && selected.getName().equalsIgnoreCase(search)) {
 				                try {
-									new NewView(selected);
+									new View(selected);
 								} catch (SQLException f) {
 									f.printStackTrace();
 								}
@@ -615,36 +642,11 @@ public class MainWindow extends JFrame {
 				} 
 			});
 		   
-		   searchBarPanel.add(searchField);
-		   searchBarPanel.add(searchBtn); 
-		   
-		   searchPanel.add(searchLabel);
-		   searchPanel.add(searchBarPanel);
-		   
-		   
-//		   mainLayout.putConstraint(SpringLayout.SOUTH, searchPanel, 10, SpringLayout.SOUTH, mainContainer);
-//		   mainLayout.putConstraint(SpringLayout.WEST, searchPanel, 0, SpringLayout.WEST, listPanel);
-		   
-		   // Control Panel.
-		   JPanel controlPanel = new JPanel();
-		   controlPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		   controlPanel.setLayout(new GridLayout(2,2,5,5));
-		   addBtn = new JButton("Add");
-		   archiveBtn = new JButton("Archive");
-		   aboutBtn = new JButton("About");
-		   logoutBtn = new JButton("Log Out");
-		   if (isAdmin) {
-			   controlPanel.add(addBtn);
-			   controlPanel.add(archiveBtn);
-		   }
-		   controlPanel.add(aboutBtn);
-		   controlPanel.add(logoutBtn);
-		   
 		   aboutBtn.addActionListener(new ActionListener() {
 	            @Override
 	            public void actionPerformed(ActionEvent e) {
 	            	About about = new About(); 
- 	                About.main(null);
+	                About.main(null);
 	            }
 		   });
 		   
@@ -686,10 +688,8 @@ public class MainWindow extends JFrame {
 			   @Override 
 			   public void actionPerformed(ActionEvent e) {
 				   try {
-					new NewAdd();
-//					Add.main(null);
+					new Add();
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 				   
@@ -698,24 +698,31 @@ public class MainWindow extends JFrame {
 		   });
 		   
 		   logoutBtn.addActionListener(new ActionListener() {
-               @Override
-               public void actionPerformed(ActionEvent e) {
-                   if(JOptionPane.showConfirmDialog(logoutBtn, "Confirm if you want to log out", "That Pokedex",
-                           JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
-                              Login login = new Login(); 
-                              Login.main(null);
-                              dispose();
-                   }    
-               }
-           });
-		   
+              @Override
+              public void actionPerformed(ActionEvent e) {
+                  if(JOptionPane.showConfirmDialog(logoutBtn, "Confirm if you want to log out", "That Pokedex",
+                          JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+                	  		// Remove filter.
+//                	  		 db.filterPokemon(null, null, null, null);
+                	  		 try {
+								db.resetFilters();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+                             Login login = new Login(); 
+                             Login.main(null);
+                             dispose();
+                  }    
+              }
+          });
 		   list.addMouseListener(new MouseAdapter() {
 			    public void mouseClicked(MouseEvent evt) {
 			        if (evt.getClickCount() == 2) {
 			            Pokemon selected = list.getSelectedValue();
 			            String sampleText = "Pokemon: " + selected.getName() + "\nTypes: " + selected.getTypes() + "\nGeneration: " + selected.getGeneration() + "\nWeight: " + selected.getWeight() + "\nSize: " + selected.getSize();
 		                try {
-							new NewView(selected);
+							new View(selected);
 						} catch (SQLException e) {
 							e.printStackTrace();
 						}
@@ -763,35 +770,5 @@ public class MainWindow extends JFrame {
 	            }
 	        });
 		   
-		   gbc.gridx = 0;
-		   gbc.gridy = 0;
-		   gbc.gridheight = 2;
-		   gbc.fill = GridBagConstraints.VERTICAL;
-		   gbc.gridwidth = 2;
-		   gbc.fill = GridBagConstraints.HORIZONTAL;
-		   getContentPane().add(listPanel,gbc);
-//	        getContentPane().add(listPanel);
-		   gbc.gridx = 2;
-		   gbc.gridy = 0;
-		   gbc.gridwidth = 1;
-		   gbc.fill = GridBagConstraints.HORIZONTAL;
-		   getContentPane().add(filterPanel,gbc);
-//		   getContentPane().add(filterPanel);
-		   gbc.gridx = 0;
-		   gbc.gridy = 2;
-		   gbc.gridheight = 1;
-		   gbc.fill = GridBagConstraints.VERTICAL;
-		   gbc.gridwidth = 2;
-		   gbc.fill = GridBagConstraints.HORIZONTAL;
-		   getContentPane().add(searchPanel,gbc);
-//		   getContentPane().add(searchPanel);
-		   gbc.gridx = 2;
-		   gbc.gridy = 2;
-		   gbc.gridwidth = 1;
-		   gbc.fill = GridBagConstraints.HORIZONTAL;
-		   getContentPane().add(controlPanel,gbc);
-//		   getContentPane().add(controlPanel);
-		   
 	   }
-
 }
