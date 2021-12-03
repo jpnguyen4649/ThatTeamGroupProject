@@ -769,6 +769,16 @@ public class MainWindow extends JFrame {
 	            	dispose();
 	            }
 	        });
+	        
+	        addWindowListener(new WindowAdapter() {
+	            public void windowClosing(WindowEvent e) {
+	            	try {
+						db.closeConnection();
+					} catch (SQLException e1) {
+						e1.printStackTrace();
+					}
+	            }
+	        });
 		   
 	   }
 }

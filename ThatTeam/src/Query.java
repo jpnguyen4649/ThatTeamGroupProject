@@ -15,6 +15,7 @@ public class Query {
 	ArrayList<GenerationFilter> gfs;
 	ArrayList<SizeFilter> sfs;
 	ArrayList<WeightFilter> wfs;
+	PreparedStatement pstmt;
 
 	public Query(String filter, String sortField, ArrayList<TypeFilter> tfs, ArrayList<GenerationFilter> gfs, ArrayList<SizeFilter> sfs, ArrayList<WeightFilter> wfs) {
 		this.filter = filter;
@@ -117,11 +118,9 @@ public class Query {
 	
 	public ResultSet executeQuery(Connection conn) {
 		ResultSet result = null;
-		 try(
-	    		  Statement stmt = conn.createStatement();	  
-	          ) {
-			      String statement = constructStatement();
-			      PreparedStatement pstmt = conn.prepareStatement(statement);
+		String statement = constructStatement();
+		 try {
+			 pstmt = conn.prepareStatement(statement);
 			      int iterator = 1;
 					if (tfs != null) {
 						for (int i = 0; i < tfs.size(); i++) {
@@ -153,6 +152,9 @@ public class Query {
 			e.printStackTrace();
 		}
 		 return result;
+	}
+	public void closePstmt() throws SQLException {
+		pstmt.close();
 	}
 	
 }
