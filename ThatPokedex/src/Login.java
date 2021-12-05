@@ -128,6 +128,12 @@ public class Login {
 				//A confirmation message pops up if you really want to log out
 				if(JOptionPane.showConfirmDialog(frmThatPokedexLogin, "Confirm if you want to exit", "That Pokedex Login",
 				   JOptionPane.YES_NO_OPTION) == JOptionPane.YES_NO_OPTION) {
+					try {
+						Database.getInstance().closeConnection();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					System.exit(0);
 				}	
 			}
